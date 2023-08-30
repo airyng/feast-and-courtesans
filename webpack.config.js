@@ -18,7 +18,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-        title: 'Raycasting test',
+        title: 'Medieval Courtesan',
         template: 'index.html',
         filename: 'index.html'
     })
