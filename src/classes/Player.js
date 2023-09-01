@@ -2,7 +2,9 @@ import { SpriteClass } from 'kontra'
 
 export default class Player extends SpriteClass {
 
-    speed = 8
+    _moveDirection = 0
+    _speed = 8
+    _winking = false
 
     constructor(properties) {
         super({
@@ -21,9 +23,26 @@ export default class Player extends SpriteClass {
         super.draw()
     }
 
-    // Calculates movement and camera positions
-    movementUpdate (moveDirection, movementBounds, scene) {
-        this.dx = moveDirection * this.speed
+    update (movementBounds, scene) {
+        // Calculates movement and camera positions
+        this.calculateMovement(movementBounds, scene)
+        super.update()
+    }
+
+    setMoveDirection (value) {
+        this._moveDirection = value
+    }
+
+    setWinking (value) {
+        this._winking = value
+    }
+
+    isWinking () {
+        return !!this._winking
+    }
+
+    calculateMovement (movementBounds, scene) {
+        this.dx = this._moveDirection * this._speed
         if (this.dx < 0 && this.x - (scene.camera.x - scene.camera.width / 2) <= movementBounds.left) {
             if (scene.camera.x <= scene.camera.width / 2) {
                 this.dx = 0
@@ -43,22 +62,4 @@ export default class Player extends SpriteClass {
             return
         }
     }
-
-    // movementUpdate (moveDirection, background, movementBounds, width) {
-    //     this.dx = moveDirection * this.speed
-    //     background.dx = 0
-        
-    //     if (this.dx < 0 && this.x <= movementBounds.left) {
-    //         this.x = movementBounds.left
-    //         if (background.x < 0) {
-    //             background.dx = -this.dx
-    //         }
-    //     }
-    //     if (this.dx > 0 && this.x >= width - movementBounds.right - this.width) {
-    //         if (background.width - width > -background.x) {
-    //             background.dx = -this.dx
-    //         }
-    //         this.x = width - movementBounds.right - this.width
-    //     }
-    // }
   }
