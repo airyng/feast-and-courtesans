@@ -4,41 +4,36 @@ const maxLoveLevel = 3
 
 export default class NPC extends SpriteClass {
 
-    _speed = 8.2
+    _speed = 3.1
     _targetX = null
     _startX = null
-    _rageMode = false
-    _rageTimeLimit = false
+    _initialScale = 1
+    _adrenalineMode = false
+    _adrenalineTimeLimit = false
     _viewLength = 300
     _loveLevel = 0
 
     constructor (properties) {
+
+        const scaleX = (properties.scale || 1) * (Math.random() > .5 ? 1 : -1)
 
         super({
             x: properties.x,
             y: properties.y,
             // required for a rectangle sprite
             anchor: {x: 0.5, y: 0},
-            width: 70,
-            height: 120,
-            scaleX: Math.random() > .5 ? 1 : -1,
-            color: properties.color || 'black'
+            scaleX,
+            scaleY: properties.scale || 1,
+            image: properties.image
         })
-        this.addChild(new SpriteClass({
-            x: 25,
-            y: 15,
-            // required for a rectangle sprite
-            width: 5,
-            height: 5,
-            color: 'black'
-        }))
+        this._viewLength = properties.viewLength || 300
         this._startX = properties.x
+        this._initialScale = scaleX
 
         setInterval(() => {
             if (this.targetX) { return }
-
+            console.log('flip', this.targetX)
             this.scaleX *= -1
-
         }, randInt(5, 10) * 1000)
     }
 
@@ -53,43 +48,44 @@ export default class NPC extends SpriteClass {
         this._targetX = targetX
     }
 
-    moveTo (targetX) {
-        const direction = targetX > this.x ? 1 : -1
-        this.dx = direction * this._speed
-        // Sprite flip
-        this.scaleX = this.dx < 0 ? -1 : 1
-    }
-
-    activateRage (rageDuration = 1) {
-        this._rageMode = true
-        this._rageTimeLimit = (rageDuration * 1000) + Date.now()
-    }
-
-    deactivateRage () {
-        this._rageMode = false
-        this._rageTimeLimit = 0
-    }
-
-    isRaged () {
-        return !!this._rageMode
-    }
-
     stopMoving () {
         this._targetX = null
         this.dx = 0
     }
 
+    moveTo (targetX) {
+        const direction = targetX > this.x ? 1 : -1
+        this.dx = direction * this._speed
+        // Sprite flip
+        this.scaleX = Math.abs(this._initialScale) * direction
+        console.log(this.dx)
+    }
+
+    activateAdrenaline (adrenalineDuration = 1) {
+        this._adrenalineMode = true
+        this._speed *= 2
+        this._adrenalineTimeLimit = (adrenalineDuration * 1000) + Date.now()
+    }
+
+    deactivateAdrenaline () {
+        this._adrenalineMode = false
+        this._speed /= 2
+        this._adrenalineTimeLimit = 0
+    }
+
+    isAdrenalined () {
+        return !!this._adrenalineMode
+    }
+
     checkIsPointInView (targetX) {
-        const min = Math.min(this.x, this.x + this._viewLength * this.scaleX)
-        const max = Math.max(this.x, this.x + this._viewLength * this.scaleX)
+        const dir = this.scaleX > 0 ? 1 : -1
+        const min = Math.min(this.x, this.x + this._viewLength * dir)
+        const max = Math.max(this.x, this.x + this._viewLength * dir)
         return targetX >= min && targetX <= max
     }
 
     update () {
-        // if (parseInt(Date.now() / 1000) % 5 === 0) {
-        //     console.log('flip')
-        // }
-        if (this._rageMode && this._rageTimeLimit <= Date.now()) { this.deactivateRage() }
+        if (this._adrenalineMode && this._adrenalineTimeLimit <= Date.now()) { this.deactivateAdrenaline() }
 
         // Check is target reached
         if (this._targetX !== null && Math.abs(this.x - this._targetX) <= this.dx) {

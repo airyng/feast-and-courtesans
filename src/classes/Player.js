@@ -3,31 +3,27 @@ import { SpriteClass } from 'kontra'
 export default class Player extends SpriteClass {
 
     _moveDirection = 0
-    _speed = 8
+    _speed = 3
     _winking = false
+    _initialScale = 1
+    _adrenalineMode = false
+    _adrenalineTimeLimit = false
 
     constructor(properties) {
+        const scale = properties.scale || 1
         super({
             x: properties.x,
             y: properties.y,
-            // required for a rectangle sprite
-            width: 70,
-            height: 120,
             anchor: {x: 0.5, y: 0},
-            color: 'red'
+            scaleX: scale,
+            scaleY: scale,
+            image: properties.image
         })
-
-        this.addChild(new SpriteClass({
-            x: 25,
-            y: 15,
-            // required for a rectangle sprite
-            width: 5,
-            height: 5,
-            color: 'black'
-        }))
+        this._initialScale = scale
     }
 
     update (movementBounds, scene) {
+        if (this._adrenalineMode && this._adrenalineTimeLimit <= Date.now()) { this.deactivateAdrenaline() }
         // Calculates movement and camera positions
         this.calculateMovement(movementBounds, scene)
         super.update()
@@ -45,10 +41,26 @@ export default class Player extends SpriteClass {
         return !!this._winking
     }
 
+    activateAdrenaline (adrenalineDuration = 1) {
+        this._adrenalineMode = true
+        this._speed *= 2
+        this._adrenalineTimeLimit = (adrenalineDuration * 1000) + Date.now()
+    }
+
+    deactivateAdrenaline () {
+        this._adrenalineMode = false
+        this._speed /= 2
+        this._adrenalineTimeLimit = 0
+    }
+
+    isAdrenalined () {
+        return !!this._adrenalineMode
+    }
+
     calculateMovement (movementBounds, scene) {
         // Sprite flip
         if (this._moveDirection !== 0) {
-            this.scaleX = this._moveDirection < 0 ? -1 : 1
+            this.scaleX = this._moveDirection < 0 ? -this._initialScale : this._initialScale
         }
         this.dx = this._moveDirection * this._speed
         const x = (this.x - (this.width * this.anchor.x))
