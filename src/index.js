@@ -47,9 +47,17 @@ async function setup () {
             }
 
             if (player.isWinking()) {
-                women
-                    .filter(woman => woman.checkIsPointInView(player.x) && woman.scaleX !== player.scaleX)
-                    .forEach(woman => woman.activateRage(keepFollowingPlayerInSec))
+                women.forEach(woman => {
+                        if (woman.checkIsPointInView(player.x) && woman.scaleX !== player.scaleX) {
+                            woman.activateRage(keepFollowingPlayerInSec)
+                        }
+                    })
+
+                men.forEach(man => {
+                        if (man.checkIsPointInView(player.x) && man.scaleX !== player.scaleX) {
+                            man.increaseLoveLevel()
+                        }
+                    })
                 player.setWinking(false)
             }
 

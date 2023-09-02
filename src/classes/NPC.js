@@ -1,5 +1,7 @@
 import { SpriteClass, randInt } from 'kontra'
 
+const maxLoveLevel = 3
+
 export default class NPC extends SpriteClass {
 
     _speed = 8.2
@@ -38,6 +40,13 @@ export default class NPC extends SpriteClass {
             this.scaleX *= -1
 
         }, randInt(5, 10) * 1000)
+    }
+
+    increaseLoveLevel (value = 1) {
+        this._loveLevel += value
+        if (this._loveLevel > maxLoveLevel) {
+            this._loveLevel = maxLoveLevel
+        }
     }
 
     setTargetX (targetX) {
