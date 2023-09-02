@@ -1,7 +1,9 @@
 import './assets/styles/main.css'
+// TODO: Настроить импорт только того, что используется в коде
 import kontra from 'kontra' // { init, GameLoop, Sprite, imageAssets }
 import Player from './classes/Player'
 import NPC from './classes/NPC'
+import inputHelper from './helpers/inputHelper'
 // import FPSChecker from './classes/FPSChecker'
 // import RecourceLoader from './classes/ResourceLoader'
 
@@ -32,36 +34,23 @@ async function setup () {
         height
     });
 
-
-    // handle user input
-    document.onkeydown = function (event) {
-        switch (event.code) {
-            case 'ArrowRight':
-            case 'KeyD': player.setMoveDirection(1); break;
-            case 'ArrowLeft':
-            case 'KeyA': player.setMoveDirection(-1); break;
-            case 'Space': player.setWinking(true); break;
-        }
-    }
-    
-    document.onkeyup = function (event) {
-        switch (event.code) {
-            case 'ArrowRight':
-            case 'KeyD': player.setMoveDirection(0); break;
-            case 'ArrowLeft':
-            case 'KeyA': player.setMoveDirection(0); break;
-            case 'Space': player.setWinking(false); break;
-        }
-    } 
-      
-      
+    inputHelper.init()
+    inputHelper.on('Space', () => player.setWinking(true))
+    inputHelper.on('ArrowRight', null, () => player.setMoveDirection(0))
+    inputHelper.on('ArrowLeft', null, () => player.setMoveDirection(0))
+            
     const loop = kontra.GameLoop({  // create the main game loop
         update () { // update the game state
-            // TODO: Получается не нажатие а "зажатие". Это не верная механика. Надо поправить
+            const maxPriorityKey = inputHelper.getMaxPriorityPressedButton(['ArrowRight', 'ArrowLeft'])
+            if (maxPriorityKey) {
+                player.setMoveDirection(maxPriorityKey === 'ArrowLeft' ? -1 : 1)
+            }
+
             if (player.isWinking()) {
                 women
                     .filter(woman => woman.checkIsPointInView(player.x) && woman.scaleX !== player.scaleX)
                     .forEach(woman => woman.activateRage(keepFollowingPlayerInSec))
+                player.setWinking(false)
             }
 
             women
