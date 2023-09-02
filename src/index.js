@@ -13,7 +13,8 @@ const   width = 1200,
         keepFollowingPlayerInSec = 5,
         { canvas } = kontra.init(),
         movementBounds = { left: 150, right: 150 },
-        sprites = {}
+        sprites = {},
+        gameEndTime = Date.now() + (60 * 1000)
 
 async function setup () {
     canvas.width = width
@@ -25,11 +26,21 @@ async function setup () {
 
     const player = new Player({ x: 300, y: height - 250 })
     const men = Array(8).fill(null).map((item, index) => new NPC({ x: 400 * (index + 1), y: height - 250, color: 'blue' })) 
-    const women = Array(8).fill(null).map((item, index) => new NPC({ x: (400 * (index + 1)) + 100, y: height - 250, color: 'pink' })) 
+    const women = Array(8).fill(null).map((item, index) => new NPC({ x: (400 * (index + 1)) + 100, y: height - 250, color: 'pink' }))
+
+    const timerText = kontra.Text({
+        text: '-',
+        font: '32px Arial',
+        color: 'white',
+        x: 50,
+        y: 50,
+        anchor: {x: 0, y: 0.5},
+        textAlign: 'center'
+      });
 
     const scene = kontra.Scene({
         id: 'game',
-        objects: [sprites.background, ...men, ...women, player],
+        objects: [sprites.background, ...men, ...women, player, timerText],
         width: sprites.background.width,
         height
     });
@@ -68,6 +79,12 @@ async function setup () {
             player?.update(movementBounds, scene)
             sprites.background?.update()
             women.forEach(woman => woman.update())
+
+            // Timer
+            const timeLeft = Math.floor((gameEndTime - Date.now()) / 1000)
+            timerText.text = `TIME LEFT: ${timeLeft} s`
+            timerText.x = 50 + scene.camera.x - scene.camera.width/2
+            if (timeLeft <= 0) { loop.stop() }
         },
         render () { // render the game state
             scene.render()
