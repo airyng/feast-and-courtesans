@@ -58,11 +58,15 @@ async function setup () {
     const loop = kontra.GameLoop({  // create the main game loop
         update () { // update the game state
             // TODO: Получается не нажатие а "зажатие". Это не верная механика. Надо поправить
-            player.isWinking() && women[0].activateRage(keepFollowingPlayerInSec)
+            if (player.isWinking()) {
+                women
+                    .filter(woman => woman.checkIsPointInView(player.x))
+                    .forEach(woman => woman.activateRage(keepFollowingPlayerInSec))
+            }
 
             women
                 .filter(woman => woman.isRaged())
-                .forEach((woman) => { woman.setTargetX(player.x) })
+                .forEach(woman => woman.setTargetX(player.x))
 
             player?.update(movementBounds, scene)
             sprites.background?.update()

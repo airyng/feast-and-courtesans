@@ -7,6 +7,8 @@ export default class NPC extends SpriteClass {
     _startX = null
     _rageMode = false
     _rageTimeLimit = false
+    _viewLength = 300
+    _loveLevel = 0
 
     constructor (properties) {
 
@@ -20,6 +22,7 @@ export default class NPC extends SpriteClass {
             dy: 0,
             color: properties.color || 'black'
         })
+
         this._startX = properties.x
     }
 
@@ -51,6 +54,11 @@ export default class NPC extends SpriteClass {
         this.dx = 0
     }
 
+    checkIsPointInView (targetX) {
+        const x = this.scaleX > 0 ? this.x + this.width : this.x
+        return targetX >= x && targetX <= (x + this._viewLength)
+    }
+
     update () {
         
         if (this._rageMode && this._rageTimeLimit <= Date.now()) { this.deactivateRage() }
@@ -64,6 +72,7 @@ export default class NPC extends SpriteClass {
         }
         // Move to target if exists
         this._targetX !== null && this.moveTo(this._targetX)
+        
 
         super.update()
     }
