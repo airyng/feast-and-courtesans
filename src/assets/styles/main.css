@@ -3,6 +3,11 @@ html, body {
     padding: 0;
     background-color: rgb(192, 192, 190);
 }
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 canvas {
     margin: 10px;
     display: block;
