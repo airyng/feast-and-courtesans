@@ -1,4 +1,4 @@
-import { SpriteClass } from 'kontra'
+import { SpriteClass, randInt } from 'kontra'
 
 export default class NPC extends SpriteClass {
 
@@ -16,14 +16,28 @@ export default class NPC extends SpriteClass {
             x: properties.x,
             y: properties.y,
             // required for a rectangle sprite
+            anchor: {x: 0.5, y: 0},
             width: 70,
             height: 120,
-            dx: 0,
-            dy: 0,
+            scaleX: Math.random() > .5 ? 1 : -1,
             color: properties.color || 'black'
         })
-
+        this.addChild(new SpriteClass({
+            x: 25,
+            y: 15,
+            // required for a rectangle sprite
+            width: 5,
+            height: 5,
+            color: 'black'
+        }))
         this._startX = properties.x
+
+        setInterval(() => {
+            if (this.targetX) { return }
+
+            this.scaleX *= -1
+
+        }, randInt(5, 10) * 1000)
     }
 
     setTargetX (targetX) {
@@ -33,6 +47,8 @@ export default class NPC extends SpriteClass {
     moveTo (targetX) {
         const direction = targetX > this.x ? 1 : -1
         this.dx = direction * this._speed
+        // Sprite flip
+        this.scaleX = this.dx < 0 ? -1 : 1
     }
 
     activateRage (rageDuration = 1) {
@@ -55,12 +71,15 @@ export default class NPC extends SpriteClass {
     }
 
     checkIsPointInView (targetX) {
-        const x = this.scaleX > 0 ? this.x + this.width : this.x
-        return targetX >= x && targetX <= (x + this._viewLength)
+        const min = Math.min(this.x, this.x + this._viewLength * this.scaleX)
+        const max = Math.max(this.x, this.x + this._viewLength * this.scaleX)
+        return targetX >= min && targetX <= max
     }
 
     update () {
-        
+        // if (parseInt(Date.now() / 1000) % 5 === 0) {
+        //     console.log('flip')
+        // }
         if (this._rageMode && this._rageTimeLimit <= Date.now()) { this.deactivateRage() }
 
         // Check is target reached
@@ -75,9 +94,5 @@ export default class NPC extends SpriteClass {
         
 
         super.update()
-    }
-  
-    draw () {
-        super.draw()
     }
   }

@@ -60,7 +60,7 @@ async function setup () {
             // TODO: Получается не нажатие а "зажатие". Это не верная механика. Надо поправить
             if (player.isWinking()) {
                 women
-                    .filter(woman => woman.checkIsPointInView(player.x))
+                    .filter(woman => woman.checkIsPointInView(player.x) && woman.scaleX !== player.scaleX)
                     .forEach(woman => woman.activateRage(keepFollowingPlayerInSec))
             }
 
