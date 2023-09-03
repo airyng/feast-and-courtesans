@@ -4,6 +4,8 @@ import kontra from 'kontra' // { init, GameLoop, Sprite, imageAssets }
 import Player from './classes/Player'
 import NPC from './classes/NPC'
 import inputHelper from './helpers/inputHelper'
+import sprites from './spritesMap'
+import spriteSheetsGenerator from './spriteSheetsGenerator'
 // import FPSChecker from './classes/FPSChecker'
 // import RecourceLoader from './classes/ResourceLoader'
 
@@ -13,7 +15,6 @@ const   width = 1200,
         keepFollowingPlayerInSec = 5,
         { canvas } = kontra.init(),
         movementBounds = { left: 150, right: 150 },
-        sprites = {},
         gameEndTime = Date.now() + (60 * 1000)
 
 async function setup () {
@@ -21,16 +22,14 @@ async function setup () {
     canvas.height = height
     // console.log(kontra)
     kontra.getContext().imageSmoothingEnabled = false
-    sprites.background = require('./assets/images/background.jpg')
-    sprites.player1_1 = require('./assets/images/player.1.1.png')
-    sprites.man1_1 = require('./assets/images/man.1.1.png')
-    sprites.woman1_1 = require('./assets/images/woman.1.1.png')
-    await kontra.load(sprites.background, sprites.man1_1, sprites.woman1_1, sprites.player1_1)
-    sprites.background = kontra.Sprite({ x: 0, y: 0, image: kontra.imageAssets[sprites.background] })
+    await kontra.load(...Object.keys(sprites).map((key) => sprites[key]))
 
-    const player = new Player({ x: 300, y: height - 250, image: kontra.imageAssets[sprites.player1_1], scale: 3 })
-    const men = Array(8).fill(null).map((item, index) => new NPC({ x: 400 * (index + 1), y: height - 250, image: kontra.imageAssets[sprites.man1_1], scale: 3 })) 
-    const women = Array(8).fill(null).map((item, index) => new NPC({ x: (400 * (index + 1)) + 100, y: height - 250, image: kontra.imageAssets[sprites.woman1_1], scale: 3, viewLength: 500 }))
+    const spriteSheets = spriteSheetsGenerator(kontra.imageAssets)
+
+    const background = kontra.Sprite({ x: 0, y: 0, image: kontra.imageAssets[sprites.background] })
+    const player = new Player({ x: 300, y: height - 250, animations: spriteSheets.playerSpritesheet.animations, scale: 3 }) // image: kontra.imageAssets[sprites.player1_1]
+    const men = Array(8).fill(null).map((item, index) => new NPC({ x: 400 * (index + 1), y: height - 250, animations: spriteSheets[`men${kontra.randInt(1, 2)}Spritesheet`].animations, scale: 3 })) // image: kontra.imageAssets[sprites.man1_1]
+    const women = Array(8).fill(null).map((item, index) => new NPC({ x: (400 * (index + 1)) + 100, y: height - 250, animations: spriteSheets.womenSpritesheet.animations, scale: 3, viewLength: 500 })) //  image: kontra.imageAssets[sprites.woman1_1]
     
     const timerText = kontra.Text({
         text: '-',
@@ -44,8 +43,8 @@ async function setup () {
 
     const scene = kontra.Scene({
         id: 'game',
-        objects: [sprites.background, ...men, ...women, player, timerText],
-        width: sprites.background.width,
+        objects: [background, ...men, ...women, player, timerText],
+        width: background.width,
         height
     });
 
@@ -82,7 +81,8 @@ async function setup () {
                 .forEach(woman => woman.setTargetX(player.x))
 
             player?.update(movementBounds, scene)
-            sprites.background?.update()
+            background?.update()
+            men.forEach(woman => woman.update())
             women.forEach(woman => woman.update())
 
             // Timer

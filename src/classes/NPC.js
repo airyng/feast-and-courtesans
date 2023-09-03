@@ -4,7 +4,8 @@ const maxLoveLevel = 3
 
 export default class NPC extends SpriteClass {
 
-    _speed = 3.1
+    _maxSpeed = 3.1
+    _speed = 0
     _targetX = null
     _startX = null
     _initialScale = 1
@@ -16,7 +17,9 @@ export default class NPC extends SpriteClass {
     constructor (properties) {
 
         const scaleX = (properties.scale || 1) * (Math.random() > .5 ? 1 : -1)
-
+        const attrs = {}
+        if (properties.image) { attrs.image = properties.image }
+        if (properties.animations) { attrs.animations = properties.animations }
         super({
             x: properties.x,
             y: properties.y,
@@ -24,16 +27,17 @@ export default class NPC extends SpriteClass {
             anchor: {x: 0.5, y: 0},
             scaleX,
             scaleY: properties.scale || 1,
-            image: properties.image
+            ...attrs
         })
         this._viewLength = properties.viewLength || 300
         this._startX = properties.x
         this._initialScale = scaleX
+        this._speed = this._maxSpeed
 
         setInterval(() => {
             if (this.targetX) { return }
-            console.log('flip', this.targetX)
             this.scaleX *= -1
+            this.animations?.sip && this.playAnimation('sip')
         }, randInt(5, 10) * 1000)
     }
 
@@ -51,6 +55,7 @@ export default class NPC extends SpriteClass {
     stopMoving () {
         this._targetX = null
         this.dx = 0
+        this.animations?.idle && this.playAnimation('idle')
     }
 
     moveTo (targetX) {
@@ -58,18 +63,19 @@ export default class NPC extends SpriteClass {
         this.dx = direction * this._speed
         // Sprite flip
         this.scaleX = Math.abs(this._initialScale) * direction
-        console.log(this.dx)
+        this.animations?.walk && this.playAnimation('walk')
+        this.isAdrenalined() && this.animations?.run && this.playAnimation('run')
     }
 
     activateAdrenaline (adrenalineDuration = 1) {
         this._adrenalineMode = true
-        this._speed *= 2
+        this._speed = this._maxSpeed * 2
         this._adrenalineTimeLimit = (adrenalineDuration * 1000) + Date.now()
     }
 
     deactivateAdrenaline () {
         this._adrenalineMode = false
-        this._speed /= 2
+        this._speed = this._maxSpeed / 2
         this._adrenalineTimeLimit = 0
     }
 

@@ -3,23 +3,29 @@ import { SpriteClass } from 'kontra'
 export default class Player extends SpriteClass {
 
     _moveDirection = 0
-    _speed = 3
+    _maxSpeed = 3
+    _speed = 0
     _winking = false
     _initialScale = 1
     _adrenalineMode = false
     _adrenalineTimeLimit = false
 
-    constructor(properties) {
+    constructor (properties) {
         const scale = properties.scale || 1
+        const attrs = {}
+        if (properties.image) { attrs.image = properties.image }
+        if (properties.animations) { attrs.animations = properties.animations }
+
         super({
             x: properties.x,
             y: properties.y,
             anchor: {x: 0.5, y: 0},
             scaleX: scale,
             scaleY: scale,
-            image: properties.image
+            ...attrs
         })
         this._initialScale = scale
+        this._speed = this._maxSpeed
     }
 
     update (movementBounds, scene) {
@@ -30,6 +36,14 @@ export default class Player extends SpriteClass {
     }
 
     setMoveDirection (value) {
+        if (this._moveDirection === value) { return }
+
+        if (value === 0) {
+            this.animations?.idle && this.playAnimation('idle')
+        } else {
+            this.animations?.walk && this.playAnimation('walk')
+            this.isAdrenalined() && this.animations?.run && this.playAnimation('run')
+        }
         this._moveDirection = value
     }
 
@@ -43,14 +57,20 @@ export default class Player extends SpriteClass {
 
     activateAdrenaline (adrenalineDuration = 1) {
         this._adrenalineMode = true
-        this._speed *= 2
+        this._speed = this._maxSpeed * 2
         this._adrenalineTimeLimit = (adrenalineDuration * 1000) + Date.now()
+        if (this.dx !== 0) {
+            this.animations?.run && this.playAnimation('run')
+        }
     }
 
     deactivateAdrenaline () {
         this._adrenalineMode = false
-        this._speed /= 2
+        this._speed = this._maxSpeed / 2
         this._adrenalineTimeLimit = 0
+        if (this.dx !== 0) {
+            this.animations?.walk && this.playAnimation('walk')
+        }
     }
 
     isAdrenalined () {
