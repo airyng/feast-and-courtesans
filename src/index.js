@@ -3,11 +3,10 @@ import './assets/styles/main.css'
 import kontra from 'kontra' // { init, GameLoop, Sprite, imageAssets }
 import Player from './classes/Player'
 import NPC from './classes/NPC'
+import Man from './classes/Man'
 import inputHelper from './helpers/inputHelper'
 import sprites from './spritesMap'
 import spriteSheetsGenerator from './spriteSheetsGenerator'
-// import FPSChecker from './classes/FPSChecker'
-// import RecourceLoader from './classes/ResourceLoader'
 
 // Constants
 const   width = 1200,
@@ -28,9 +27,9 @@ async function setup () {
 
     const background = kontra.Sprite({ x: 0, y: 0, image: kontra.imageAssets[sprites.background] })
     const player = new Player({ x: 300, y: height - 250, animations: spriteSheets.playerSpritesheet.animations, scale: 3 }) // image: kontra.imageAssets[sprites.player1_1]
-    const men = Array(8).fill(null).map((item, index) => new NPC({ x: 400 * (index + 1), y: height - 250, animations: spriteSheets[`men${kontra.randInt(1, 2)}Spritesheet`].animations, scale: 3 })) // image: kontra.imageAssets[sprites.man1_1]
+    const men = Array(8).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: height - 250, animations: spriteSheets[`men${kontra.randInt(1, 2)}Spritesheet`].animations, scale: 3 })) // image: kontra.imageAssets[sprites.man1_1]
     const women = Array(8).fill(null).map((item, index) => new NPC({ x: (400 * (index + 1)) + 100, y: height - 250, animations: spriteSheets.womenSpritesheet.animations, scale: 3, viewLength: 500 })) //  image: kontra.imageAssets[sprites.woman1_1]
-    
+
     const timerText = kontra.Text({
         text: '-',
         font: '32px Arial',

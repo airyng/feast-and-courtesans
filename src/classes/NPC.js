@@ -1,7 +1,5 @@
 import { SpriteClass, randInt } from 'kontra'
 
-const maxLoveLevel = 3
-
 export default class NPC extends SpriteClass {
 
     _maxSpeed = 3
@@ -12,7 +10,6 @@ export default class NPC extends SpriteClass {
     _adrenalineMode = false
     _adrenalineTimeLimit = false
     _viewLength = 300
-    _loveLevel = 0
 
     constructor (properties) {
 
@@ -38,14 +35,8 @@ export default class NPC extends SpriteClass {
             if (this.targetX) { return }
             this.scaleX *= -1
             this.animations?.sip && this.playAnimation('sip')
+            this.onFlipped?.()
         }, randInt(5, 10) * 1000)
-    }
-
-    increaseLoveLevel (value = 1) {
-        this._loveLevel += value
-        if (this._loveLevel > maxLoveLevel) {
-            this._loveLevel = maxLoveLevel
-        }
     }
 
     setTargetX (targetX) {
