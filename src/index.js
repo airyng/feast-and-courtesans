@@ -2,11 +2,10 @@ import './assets/styles/main.css'
 // TODO: Настроить импорт только того, что используется в коде
 import kontra from 'kontra' // { init, GameLoop, Sprite, imageAssets }
 import Player from './classes/Player'
-import NPC from './classes/NPC'
 import Man from './classes/Man'
+import Woman from './classes/Woman'
 import inputHelper from './helpers/inputHelper'
 import sprites from './spritesMap'
-import spriteSheetsGenerator from './spriteSheetsGenerator'
 
 // Constants
 const   width = 1200,
@@ -22,13 +21,11 @@ async function setup () {
     // console.log(kontra)
     kontra.getContext().imageSmoothingEnabled = false
     await kontra.load(...Object.keys(sprites).map((key) => sprites[key]))
-
-    const spriteSheets = spriteSheetsGenerator(kontra.imageAssets)
-
+    const spriteSheets = (await import ('./spriteSheetsMap')).default
     const background = kontra.Sprite({ x: 0, y: 0, image: kontra.imageAssets[sprites.background] })
-    const player = new Player({ x: 300, y: height - 250, animations: spriteSheets.playerSpritesheet.animations, scale: 3 }) // image: kontra.imageAssets[sprites.player1_1]
+    const player = new Player({ x: 300, y: height - 250, animations: spriteSheets.playerSpritesheet.animations, scale: 3, extraAnimations: { winking: spriteSheets.winkingSpritesheet.animations } }) // image: kontra.imageAssets[sprites.player1_1]
     const men = Array(8).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: height - 250, animations: spriteSheets[`men${kontra.randInt(1, 2)}Spritesheet`].animations, scale: 3 })) // image: kontra.imageAssets[sprites.man1_1]
-    const women = Array(8).fill(null).map((item, index) => new NPC({ x: (400 * (index + 1)) + 100, y: height - 250, animations: spriteSheets.womenSpritesheet.animations, scale: 3, viewLength: 500 })) //  image: kontra.imageAssets[sprites.woman1_1]
+    const women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: height - 250, animations: spriteSheets.womenSpritesheet.animations, scale: 3, viewLength: 500 })) //  image: kontra.imageAssets[sprites.woman1_1]
 
     const timerText = kontra.Text({
         text: '-',
@@ -86,7 +83,7 @@ async function setup () {
 
             // Timer
             const timeLeft = Math.floor((gameEndTime - Date.now()) / 1000)
-            timerText.text = `TIME LEFT: ${timeLeft} s`
+            timerText.text = `TIME LEFT: ${timeLeft < 0 ? 0 : timeLeft} s`
             timerText.x = 50 + scene.camera.x - scene.camera.width/2
             if (timeLeft <= 0) { loop.stop() }
         },

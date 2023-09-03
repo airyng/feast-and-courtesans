@@ -26,6 +26,16 @@ export default class Player extends SpriteClass {
         })
         this._initialScale = scale
         this._speed = this._maxSpeed
+
+        if (properties.extraAnimations.winking) {
+            const winking = new SpriteClass({
+                x: -2,
+                y: 6,
+                animations: properties.extraAnimations.winking
+            })
+            winking.opacity = 0
+            this.addChild(winking)
+        }
     }
 
     update (movementBounds, scene) {
@@ -49,6 +59,12 @@ export default class Player extends SpriteClass {
 
     setWinking (value) {
         this._winking = value
+        if (value && this.children[0]?.animations?.wink) {
+            this.children[0].opacity = 1
+            this.children[0].playAnimation('wink')
+            const animationLength = this.children[0].animations.wink.frames.length / this.children[0].animations.wink.frameRate
+            setTimeout(() => { this.children[0].opacity = 0 }, animationLength * 1000)
+        }
     }
 
     isWinking () {

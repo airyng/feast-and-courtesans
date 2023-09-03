@@ -1,11 +1,9 @@
-import { SpriteSheet } from 'kontra'
+import { SpriteSheet, imageAssets } from 'kontra'
 import sprites from './spritesMap'
 
-export default function generateSpriteSheets (imageAssets) {
+export default {
 
-    const spriteSheets = {}
-
-    spriteSheets.men1Spritesheet = new SpriteSheet({
+    men1Spritesheet: new SpriteSheet({
         image: imageAssets[sprites.menSpritesheet],
         frameWidth: 20,
         frameHeight: 40,
@@ -17,9 +15,8 @@ export default function generateSpriteSheets (imageAssets) {
                 loop: false
             }
         }
-    })
-
-    spriteSheets.men2Spritesheet = new SpriteSheet({
+    }),
+    men2Spritesheet: new SpriteSheet({
         image: imageAssets[sprites.menSpritesheet],
         frameWidth: 20,
         frameHeight: 40,
@@ -31,9 +28,8 @@ export default function generateSpriteSheets (imageAssets) {
                 loop: false
             }
         }
-    })
-
-    spriteSheets.playerSpritesheet = new SpriteSheet({
+    }),
+    playerSpritesheet: new SpriteSheet({
         image: imageAssets[sprites.womenSpritesheet],
         frameWidth: 30,
         frameHeight: 40,
@@ -48,9 +44,8 @@ export default function generateSpriteSheets (imageAssets) {
                 frameRate: 8
             }
         }
-    })
-
-    spriteSheets.womenSpritesheet = new SpriteSheet({
+    }),
+    womenSpritesheet: new SpriteSheet({
         image: imageAssets[sprites.womenSpritesheet],
         frameWidth: 30,
         frameHeight: 40,
@@ -68,6 +63,17 @@ export default function generateSpriteSheets (imageAssets) {
                 frameRate: 8
             }
         }
+    }),
+    winkingSpritesheet: new SpriteSheet({
+        image: imageAssets[sprites.winkingSpritesheet],
+        frameWidth: 7,
+        frameHeight: 14,
+        animations: {
+            wink: {
+                frames: [0, 1],
+                frameRate: 10,
+                loop: false
+            }
+        }
     })
-    return spriteSheets
 }
