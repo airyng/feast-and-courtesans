@@ -66,7 +66,7 @@ export default class Player extends SpriteClass {
 
     deactivateAdrenaline () {
         this._adrenalineMode = false
-        this._speed = this._maxSpeed / 2
+        this._speed = this._maxSpeed
         this._adrenalineTimeLimit = 0
         if (this.dx !== 0) {
             this.animations?.walk && this.playAnimation('walk')

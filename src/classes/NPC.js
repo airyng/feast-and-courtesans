@@ -4,7 +4,7 @@ const maxLoveLevel = 3
 
 export default class NPC extends SpriteClass {
 
-    _maxSpeed = 3.1
+    _maxSpeed = 3
     _speed = 0
     _targetX = null
     _startX = null
@@ -69,13 +69,13 @@ export default class NPC extends SpriteClass {
 
     activateAdrenaline (adrenalineDuration = 1) {
         this._adrenalineMode = true
-        this._speed = this._maxSpeed * 2
+        this._speed = this._maxSpeed * 2.1
         this._adrenalineTimeLimit = (adrenalineDuration * 1000) + Date.now()
     }
 
     deactivateAdrenaline () {
         this._adrenalineMode = false
-        this._speed = this._maxSpeed / 2
+        this._speed = this._maxSpeed
         this._adrenalineTimeLimit = 0
     }
 
