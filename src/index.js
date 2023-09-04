@@ -15,6 +15,8 @@ const   width = 1200,
         movementBounds = { left: 150, right: 150 },
         gameEndTime = Date.now() + (60 * 1000)
 
+let points = 0
+
 async function setup () {
     canvas.width = width
     canvas.height = height
@@ -27,19 +29,21 @@ async function setup () {
     const men = Array(8).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: height - 250, animations: spriteSheets[`men${kontra.randInt(1, 2)}Spritesheet`].animations, scale: 3 })) // image: kontra.imageAssets[sprites.man1_1]
     const women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: height - 250, animations: spriteSheets.womenSpritesheet.animations, scale: 3, viewLength: 500 })) //  image: kontra.imageAssets[sprites.woman1_1]
 
-    const timerText = kontra.Text({
+    const textObjectGenerator = (x = 50, y = 50) => kontra.Text({
         text: '-',
-        font: '32px Arial',
+        font: '26px Arial',
         color: 'white',
-        x: 50,
-        y: 50,
+        x, y,
         anchor: {x: 0, y: 0.5},
         textAlign: 'center'
-      });
+    });
+    
+    const timerText = textObjectGenerator()
+    const pointsText = textObjectGenerator(50, 100)
 
     const scene = kontra.Scene({
         id: 'game',
-        objects: [background, ...men, ...women, player, timerText],
+        objects: [background, ...men, ...women, player, timerText, pointsText],
         width: background.width,
         height
     });
@@ -66,7 +70,9 @@ async function setup () {
 
                 men.forEach(man => {
                         if (man.checkIsPointInView(player.x) && man.scaleX !== player.scaleX) {
+                            const prevLoveLevel = man._loveLevel
                             man.increaseLoveLevel()
+                            if (prevLoveLevel < 3 && man._loveLevel === 3) { points++ }
                         }
                     })
                 player.setWinking(false)
@@ -80,6 +86,10 @@ async function setup () {
             background?.update()
             men.forEach(woman => woman.update())
             women.forEach(woman => woman.update())
+
+            // Points
+            pointsText.text = `LOVERS ATTRACTED: ${points}/${men.length}`
+            pointsText.x = 50 + scene.camera.x - scene.camera.width/2
 
             // Timer
             const timeLeft = Math.floor((gameEndTime - Date.now()) / 1000)

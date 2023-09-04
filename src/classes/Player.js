@@ -5,10 +5,12 @@ export default class Player extends SpriteClass {
     _moveDirection = 0
     _maxSpeed = 3
     _speed = 0
-    _winking = false
     _initialScale = 1
     _adrenalineMode = false
     _adrenalineTimeLimit = false
+    _winking = false
+    _lastWinkingTime = 0
+    _winkingCooldown = 2
 
     constructor (properties) {
         const scale = properties.scale || 1
@@ -58,13 +60,23 @@ export default class Player extends SpriteClass {
     }
 
     setWinking (value) {
-        this._winking = value
-        if (value && this.children[0]?.animations?.wink) {
-            this.children[0].opacity = 1
-            this.children[0].playAnimation('wink')
-            const animationLength = this.children[0].animations.wink.frames.length / this.children[0].animations.wink.frameRate
-            setTimeout(() => { this.children[0].opacity = 0 }, animationLength * 1000)
+        if (!value) {
+            this._winking = value
         }
+
+        if (!value  ||
+            !this.children[0]?.animations?.wink ||
+            Date.now() <= this._lastWinkingTime + (this._winkingCooldown * 1000)
+         ) { return }
+         
+        this._winking = value
+        // Play winking animation
+        this.children[0].opacity = 1
+        this.children[0].playAnimation('wink')
+        const animationLength = this.children[0].animations.wink.frames.length / this.children[0].animations.wink.frameRate
+        setTimeout(() => { this.children[0].opacity = 0 }, animationLength * 1000)
+
+        this._lastWinkingTime = Date.now()
     }
 
     isWinking () {
