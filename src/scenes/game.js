@@ -21,11 +21,10 @@ export default async function setup (props) {
     const timerText = textObjectGenerator()
     const pointsText = textObjectGenerator({x: 50, y: 100})
     const preStartText = textObjectGenerator({x: props.width / 2, y: props.height / 2 - 200, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}})
-
     const scene = new Scene({
         id: 'game',
         objects: [background, ...men, ...women, player, timerText, pointsText],
-        width: props.width,
+        width: imageAssets[props.sprites.background].width,
         height: props.height
     });
 
