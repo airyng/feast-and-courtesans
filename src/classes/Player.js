@@ -29,7 +29,7 @@ export default class Player extends SpriteClass {
         this._initialScale = scale
         this._speed = this._maxSpeed
 
-        if (properties.extraAnimations.winking) {
+        if (properties.extraAnimations?.winking) {
             const winking = new SpriteClass({
                 x: -2,
                 y: 6,
@@ -105,7 +105,7 @@ export default class Player extends SpriteClass {
         return !!this._adrenalineMode
     }
 
-    calculateMovement (movementBounds, scene) {
+    calculateMovement (scene, movementBounds = { left: 150, right: 150 }) {
         // Sprite flip
         if (this._moveDirection !== 0) {
             this.scaleX = this._moveDirection < 0 ? -this._initialScale : this._initialScale

@@ -34,7 +34,10 @@ export default {
         frameWidth: 30,
         frameHeight: 40,
         animations: {
-            idle: { frames: 0 },
+            idle: {
+                frames: [0, 1],
+                frameRate: 0.5
+            },
             walk: {
                 frames: [0, 1],
                 frameRate: 2

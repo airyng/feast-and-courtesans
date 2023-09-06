@@ -10,6 +10,7 @@ export default class NPC extends SpriteClass {
     _adrenalineMode = false
     _adrenalineTimeLimit = false
     _viewLength = 300
+    _flipInterval = null
 
     constructor (properties) {
 
@@ -31,12 +32,16 @@ export default class NPC extends SpriteClass {
         this._initialScale = scaleX
         this._speed = this._maxSpeed
 
-        setInterval(() => {
+        this._flipInterval = setInterval(() => {
             if (this.targetX) { return }
             this.scaleX *= -1
             this.animations?.sip && this.playAnimation('sip')
             this.onFlipped?.()
         }, randInt(5, 10) * 1000)
+    }
+
+    clearCycle () {
+        clearInterval(this._flipInterval)
     }
 
     setTargetX (targetX) {
