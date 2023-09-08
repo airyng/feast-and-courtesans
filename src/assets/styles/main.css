@@ -9,9 +9,8 @@ body {
     justify-content: center;
 }
 canvas {
-    margin: 10px;
+    margin: 0;
     display: block;
     /* width: 100vw;
     height: 100vh; */
 }
-  

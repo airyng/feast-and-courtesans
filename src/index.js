@@ -1,6 +1,7 @@
 import './assets/styles/main.css'
 import { init, getContext, load } from 'kontra'
 import sprites from './spritesMap'
+import { setObjectDimensions } from './helpers/graphicsHelper'
 
 const   width = 1200,
         height = 800,
@@ -9,6 +10,8 @@ const   width = 1200,
 canvas.width = width
 canvas.height = height
 getContext().imageSmoothingEnabled = false
+
+;['load', 'resize'].forEach(type => window.addEventListener(type, () => setObjectDimensions(canvas, document.querySelector('body'))))
 
 // Load all the sprites and spritesheets
 await load(...Object.keys(sprites).map((key) => sprites[key]))
