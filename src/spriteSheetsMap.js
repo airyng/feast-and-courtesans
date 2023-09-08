@@ -32,7 +32,7 @@ export default {
     playerSpritesheet: new SpriteSheet({
         image: imageAssets[sprites.womenSpritesheet],
         frameWidth: 30,
-        frameHeight: 40,
+        frameHeight: 38,
         animations: {
             idle: {
                 frames: [0, 1],
@@ -51,7 +51,7 @@ export default {
     womenSpritesheet: new SpriteSheet({
         image: imageAssets[sprites.womenSpritesheet],
         frameWidth: 30,
-        frameHeight: 40,
+        frameHeight: 38,
         animations: {
             idle: {
                 frames: [2, 3],

@@ -14,9 +14,9 @@ export default async function setup (props) {
         gameEndTime = null
 
     const background = new Sprite({ x: 0, y: 0, image: imageAssets[props.sprites.background] })
-    const player = new Player({ x: 300, y: props.height - 250, animations: props.spriteSheets.playerSpritesheet.animations, scale: 3, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } })
+    const player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: 3, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } })
     const men = Array(8).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: props.height - 250, animations: props.spriteSheets[`men${randInt(1, 2)}Spritesheet`].animations, scale: 3 }))
-    const women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: props.height - 250, animations: props.spriteSheets.womenSpritesheet.animations, scale: 3, viewLength: 500 }))
+    const women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: 3, viewLength: 500 }))
 
     const timerText = textObjectGenerator()
     const pointsText = textObjectGenerator({x: 50, y: 100})

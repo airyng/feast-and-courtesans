@@ -32,7 +32,7 @@ export default class Player extends SpriteClass {
         if (properties.extraAnimations?.winking) {
             const winking = new SpriteClass({
                 x: -2,
-                y: 6,
+                y: 5,
                 animations: properties.extraAnimations.winking
             })
             winking.opacity = 0

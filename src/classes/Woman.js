@@ -8,7 +8,7 @@ export default class Man extends NPC {
 
     constructor (properties) {
         super(properties)
-        const ragedEyes = new Sprite({ image: imageAssets[sprites.rage], x: -3, y: 10, opacity: 0 })
+        const ragedEyes = new Sprite({ image: imageAssets[sprites.rage], x: -3, y: 8, opacity: 0 })
         this.addChild(ragedEyes)
     }
     

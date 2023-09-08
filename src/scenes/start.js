@@ -18,7 +18,7 @@ export default async function setup (props, loadScene) {
                                                 text: 'Press \'arrows\' to move left and right. Press \'space\' to make an seductive wink',
                                                 x: props.width / 2, y: props.height - 100, color: 'grey', font: '16px cursive, Arial'
                                             }),
-            player = new Player({ x: 300, y: props.height - 250, animations: props.spriteSheets.playerSpritesheet.animations, scale: 3, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
+            player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: 3, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
             stars = new Array(starsNumber).fill(null).map(() => ({ x: randInt(5, props.width - 5), y: randInt(5, props.height - 400), visible: true }))
             
     const starsBlinkingInterval = setInterval(() => {
