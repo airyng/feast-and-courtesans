@@ -63,7 +63,7 @@ export default async function setup (props, loadScene) {
             drawLine(scene, {x: props.width - 150, y: gy - 5}, {x: props.width, y: gy - 5}, 'grey', 10) // Step 1
             drawLine(scene, {x: props.width - 100, y: gy - 15}, {x: props.width, y: gy - 15}, 'grey', 10) // Step 2
             drawLine(scene, {x: props.width - 50, y: gy - 25}, {x: props.width, y: gy - 25}, 'grey', 10) // Step 3
-            drawLine(scene, {x: props.width - 5, y: gy - 500}, {x: props.width - 5, y: gy}, 'grey', 10) // Door
+            drawLine(scene, {x: props.width - 5, y: gy - 280}, {x: props.width - 5, y: gy}, 'grey', 10) // Door
 
             stars.forEach((star) => {
                 if (!star.visible) { return }

@@ -1,4 +1,4 @@
-import { Text, Sprite } from 'kontra'
+import { Text, Sprite, Pool } from 'kontra'
 
 export const textObjectGenerator = (props = {}) => new Text({
     text: '-',
@@ -19,3 +19,18 @@ export const rectangleGenerator = (props = {}) => new Sprite({
     anchor: {x: 0, y: 0},
     ...props
 })
+
+export const poolGenerator = (settings = {}) => {
+    let pool = Pool({ maxSize: settings.maxSize || 1, create: Sprite })
+    return {
+        pool,
+        update: () => {
+            pool.get(settings.get())
+            pool.update()
+        },
+        destroyPool: () => {
+            pool.clear()
+            pool = undefined
+        }
+    }
+}
