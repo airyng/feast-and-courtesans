@@ -9,8 +9,9 @@ import { createBlinkingStars, drawLine } from '../helpers/graphicsHelper'
 
 const keepFollowingPlayerInSec = 5
 const spriteScale = 3
+const playTime = 60 * 2
 
-const createBackWink = function (x, y) {
+const createBackWink = function (x, y, startPlay = true) {
     const _backWink = new GameObject({ x, y })
     const eyes = new Array(2).fill(null).map((item, index) => new Sprite({
         x: 12 * index,
@@ -44,7 +45,7 @@ const createBackWink = function (x, y) {
         }, 3000)
     }
 
-    setTimeout(endWink, parseInt(5000 * Math.random()))
+    startPlay && setTimeout(endWink, parseInt(5000 * Math.random()))
 
     return _backWink
 }
@@ -89,6 +90,7 @@ export default async function setup (props, loadScene) {
     const pointsText = textObjectGenerator({x: 50, y: 80})
     const preStartText = textObjectGenerator({x: props.width / 2, y: 65, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}})
     const killedText = textObjectGenerator({x: props.width / 2, y: props.height / 2, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}, text: 'You\'re dead', opacity: 0})
+    const winText = textObjectGenerator({x: props.width / 2, y: props.height / 2, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}, text: 'All the boyars are seduced 😜', opacity: 0})
     const timeOverText = textObjectGenerator({x: props.width / 2, y: props.height / 2, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}, text: 'Time\'s up', opacity: 0})
     const instructions = textObjectGenerator({
         text: 'Press \'space\' to restart',
@@ -154,7 +156,7 @@ export default async function setup (props, loadScene) {
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
     const startGameplay = () => {
-        gameEndTime = Date.now() + (60 * 1000)
+        gameEndTime = Date.now() + (playTime * 1000)
         timerStarted = true
         inputHelper.init()
         inputHelper.on('Space', () => player.setWinking(true))
@@ -179,16 +181,27 @@ export default async function setup (props, loadScene) {
     let killerOfPlayer = null
     let timesUp = false
 
+    function checkIsGoalReached () {
+        return points >= men.length
+    }
+
     function stopGameInteractionsScreen () {
         inputHelper.off('Space')
         inputHelper.off('ArrowRight')
         inputHelper.off('ArrowLeft')
+        player.setMoveDirection(0)
         ;[...men, ...women.filter(_woman => _woman !== killerOfPlayer)].forEach(obj => obj.clearCycle())
         candles.forEach(candle => candle.forEach(poolContainer => poolContainer.destroy()))
         backWinks.forEach(o => {
             o.ttl = 0
             o.children.forEach(c => c.opacity = 0)
         })
+        if (killerOfPlayer) {
+            player.currentAnimation?.stop?.()
+            const playerWink = createBackWink(player.x - 9, player.y + 27, false)
+            playerWink.children.forEach(c => c.opacity = 1)
+            scene.objects.push(playerWink)
+        }
         setTimeout(() => {
             instructions.opacity = 1
             inputHelper.on('Space', () => { 
@@ -196,11 +209,11 @@ export default async function setup (props, loadScene) {
             })
         }, 1000)
     }
-            
+
     const loop = new GameLoop({  // create the main game loop
         update () { // update the game state
             const maxPriorityKey = inputHelper.getMaxPriorityPressedButton(['ArrowRight', 'ArrowLeft'])
-            if (!killerOfPlayer && !timesUp && timerStarted && maxPriorityKey) {
+            if (!checkIsGoalReached() && !killerOfPlayer && !timesUp && timerStarted && maxPriorityKey) {
                 player.setMoveDirection(maxPriorityKey === 'ArrowLeft' ? -1 : 1)
             }
 
@@ -216,7 +229,10 @@ export default async function setup (props, loadScene) {
                         if (man.checkIsPointInView(player.x) && man.scaleX !== player.scaleX) {
                             const prevLoveLevel = man._loveLevel
                             man.increaseLoveLevel()
-                            if (prevLoveLevel < 3 && man._loveLevel === 3) { points++ }
+                            if (prevLoveLevel < 3 && man._loveLevel === 3) {
+                                points++
+                                checkIsGoalReached() && stopGameInteractionsScreen()
+                            }
                         }
                     })
                 player.setWinking(false)
@@ -263,7 +279,7 @@ export default async function setup (props, loadScene) {
                 }
             })
             // When player failed -> run end screen
-            if (killerOfPlayer || timesUp) {
+            if (!checkIsGoalReached() && (killerOfPlayer || timesUp)) {
                 if (killerOfPlayer) {
                     bloodBurst.forEach(blood => blood.update())
                 }
@@ -279,11 +295,49 @@ export default async function setup (props, loadScene) {
                     }
                 }
             }
+            // When player reached the goal
+            if (checkIsGoalReached()) {
+                
+                player.setMoveDirection(-1)
+                
+                const hasUncollectedMen = men.filter(man => man.opacity === 1)?.length > 0
+
+                if (hasUncollectedMen) {
+                    // Collect men
+                    men.forEach(man => {
+                        if (man.scaleX < 0.01) {
+                            man.opacity = 0
+                            return
+                        }
+                        man.children.forEach(c => c.opacity = 0)
+                        let lerpSpeed = parseFloat( (1 / Math.abs(Math.abs(man.x) - Math.abs(player.x))) )
+                        if (!lerpSpeed) { lerpSpeed = 0.01}
+                        lerpSpeed *= 4
+
+                        man.x = lerp(man.x, player.x, lerpSpeed)
+                        man.y = lerp(man.y, player.y + player.height * 2, lerpSpeed)
+                        man.scaleX = lerp(man.scaleX, 0, lerpSpeed / 2)
+                        man.scaleY = lerp(man.scaleY, 0, lerpSpeed / 2)
+                    })
+                } else {
+                    player.activateAdrenaline()
+                }
+                if (player.x <= 200) {
+                    ;[backgroundStart, ...backgroundRepeatables, backgroundEnd, ...men, ...women].forEach(sprite => {
+                        sprite.opacity = lerp(sprite.opacity, 0, 0.05)
+                        sprite.children.forEach(c => c.opacity = 0)
+                    })
+                    if (backgroundStart.opacity < 0.01) {
+                        winText.opacity = lerp(winText.opacity, 1, 0.005)
+                    }
+                }
+                
+            }
         },
         render () { // render the game state
             scene.render()
             drawLine(scene, {x: 0, y: 115}, {x: props.width, y: 115}, 'grey', 10)
-            ;[blinkingStars, preStartText, preStartText, killedText, timeOverText, instructions].forEach(o => o?.render())
+            ;[blinkingStars, preStartText, preStartText, winText, killedText, timeOverText, instructions].forEach(o => o?.render())
         }
     })
 

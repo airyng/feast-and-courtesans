@@ -10,7 +10,7 @@ export default class Player extends SpriteClass {
     _adrenalineTimeLimit = false
     _winking = false
     _lastWinkingTime = 0
-    _winkingCooldown = 2
+    _winkingCooldown = 1.5
 
     constructor (properties) {
         const scale = properties.scale || 1
