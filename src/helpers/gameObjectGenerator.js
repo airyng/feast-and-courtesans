@@ -2,7 +2,7 @@ import { Text, Sprite, Pool } from 'kontra'
 
 export const textObjectGenerator = (props = {}) => new Text({
     text: '-',
-    font: '26px cursive, Arial',
+    font: '24px cursive, Arial',
     color: 'white',
     x: 50, y: 50,
     anchor: {x: 0, y: 0.5},
@@ -28,9 +28,12 @@ export const poolGenerator = (settings = {}) => {
             pool.get(settings.get())
             pool.update()
         },
-        destroyPool: () => {
+        destroy: () => {
+            pool.objects.forEach(o => {
+                o.opacity = 0
+                o.ttl = 0
+            })
             pool.clear()
-            pool = undefined
         }
     }
 }
