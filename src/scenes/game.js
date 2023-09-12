@@ -72,50 +72,61 @@ const createCandlesSparks = (x) => {
     return pools
 }
 
+
 export default async function setup (props, loadScene) {
+    const   backgroundRepeatableImage = imageAssets[props.sprites.backgroundRepeatable],
+            backgroundStartImage = imageAssets[props.sprites.backgroundStart],
+            backgroundEndImage = imageAssets[props.sprites.backgroundEnd],
+            anchorCenter = {x: 0.5, y: 0.5},
+            halfWidth = props.width / 2,
+            halfHeight = props.height / 2
+
     let points = 0,
         timerStarted = false,
         gameEndTime = null
 
-    const backgroundStart = new Sprite({ x: 0, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.backgroundStart], opacity: .8 })
-    const backgroundRepeatables = new Array(4).fill(null).map((item, index) => new Sprite({ x: (84 * spriteScale) + (index * imageAssets[props.sprites.backgroundRepeatable].width * spriteScale), y: 120, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.backgroundRepeatable], opacity: .8 }))
-    const sceneWidth = imageAssets[props.sprites.backgroundStart].width * spriteScale + (imageAssets[props.sprites.backgroundRepeatable].width * backgroundRepeatables.length * spriteScale) + imageAssets[props.sprites.backgroundEnd].width * spriteScale
-    const backgroundEnd = new Sprite({ x: sceneWidth - imageAssets[props.sprites.backgroundEnd].width * spriteScale, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.backgroundEnd], opacity: .8 })
-    const player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } })
-    const men = Array(8).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: props.height - 250, animations: props.spriteSheets[`men${randInt(1, 2)}Spritesheet`].animations, scale: spriteScale }))
-    const women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 }))
-
-    const timerText = textObjectGenerator({x: 50, y: 40})
-    const pointsText = textObjectGenerator({x: 50, y: 80})
-    const preStartText = textObjectGenerator({x: props.width / 2, y: 65, fontSize: 80, anchor: {x: 0.5, y: 0.5}})
-    const killedText = textObjectGenerator({x: props.width / 2, y: props.height / 2, fontSize: 80, anchor: {x: 0.5, y: 0.5}, text: 'You\'re dead', opacity: 0})
-    const winText = textObjectGenerator({x: props.width / 2, y: props.height / 2, fontSize: 80, anchor: {x: 0.5, y: 0.5}, text: 'All the boyars are seduced 😜', opacity: 0})
-    const timeOverText = textObjectGenerator({x: props.width / 2, y: props.height / 2, fontSize: 80, anchor: {x: 0.5, y: 0.5}, text: 'Time\'s up', opacity: 0})
-    const instructions = textObjectGenerator({
-        text: 'Press \'space\' to restart',
-        x: props.width / 2, y: props.height - 100, color: 'grey', fontSize: 16,
-        opacity: 0,
-        anchor: { x: .5, y: .5 }
-    })
+    const   candleImages = [116, 460, 814, 1230, 1580, 2000, 2350, 2762, 3120, 3372].map(x => new Sprite({ x, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.candle] })),
+            backgroundStart = new Sprite({ x: 0, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundStartImage }),
+            backgroundRepeatables = new Array(4).fill(null).map((item, index) => new Sprite({ x: (84 * spriteScale) + (index * backgroundRepeatableImage.width * spriteScale), y: 207, scaleX: spriteScale, scaleY: spriteScale, image: backgroundRepeatableImage })),
+            carpetRepeatables = [imageAssets[props.sprites.carpet1], imageAssets[props.sprites.carpet2]].map((image, imageI) => new Array(120).fill(null).map((item, index) => new Sprite({ x: (index * image.width * spriteScale), y: imageI ? 681 : 630, scaleX: spriteScale, scaleY: spriteScale, image }))).flat(),
+            ceiling = new Sprite({ x: 252, y: 110, color: '#8d8688', width: 3072, height: 98 }),
+            carpetBrick = new Sprite({ x: 0, y: 652, color: '#b20116', width: 3500, height: 30 }),
+            sceneWidth = backgroundStartImage.width * spriteScale + (backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale) + backgroundEndImage.width * spriteScale,
+            backgroundEnd = new Sprite({ x: sceneWidth - backgroundEndImage.width * spriteScale, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundEndImage }),
+            player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
+            men = Array(1).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: props.height - 250, animations: props.spriteSheets[`men${randInt(1, 2)}Spritesheet`].animations, scale: spriteScale })),
+            women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
+            timerText = textObjectGenerator({x: 50, y: 40}),
+            pointsText = textObjectGenerator({x: 50, y: 80}),
+            preStartText = textObjectGenerator({x: halfWidth, y: 65, fontSize: 80, anchor: anchorCenter}),
+            killedText = textObjectGenerator({x: halfWidth, y: halfHeight, fontSize: 80, anchor: anchorCenter, text: 'You\'re dead', opacity: 0}),
+            winText = textObjectGenerator({x: halfWidth, y: halfHeight, fontSize: 80, anchor: anchorCenter, text: 'All the boyars are seduced 😜', opacity: 0}),
+            timeOverText = textObjectGenerator({x: halfWidth, y: halfHeight, fontSize: 80, anchor: anchorCenter, text: 'Time\'s up', opacity: 0}),
+            instructions = textObjectGenerator({
+                text: 'Press \'space\' to restart',
+                x: halfWidth, y: props.height - 100, color: 'grey', fontSize: 16,
+                opacity: 0,
+                anchor: { x: .5, y: .5 }
+            })
     
     // Set eyes positions
     const backWinksPositions = [ {x: 210, y: props.height - 284} ]
     for (let i = 0; i < 4; i++) {
         [
-            {x: 363, y: props.height - 284},
-            {x: 420, y: props.height - 293},
-            {x: 534, y: props.height - 296},
-            {x: 606, y: props.height - 287},
-            {x: 681, y: props.height - 296},
-            {x: 798, y: props.height - 296},
-            {x: 978, y: props.height - 300}
+            {x: 363, y: 284},
+            {x: 420, y: 293},
+            {x: 534, y: 296},
+            {x: 606, y: 287},
+            {x: 681, y: 296},
+            {x: 798, y: 296},
+            {x: 978, y: 300}
         ].forEach(o => {
-            backWinksPositions.push({ x: o.x + ((imageAssets[props.sprites.backgroundRepeatable].width * spriteScale) * i), y: o.y })
+            backWinksPositions.push({ x: o.x + ((backgroundRepeatableImage.width * spriteScale) * i), y: props.height - o.y })
         })
     }
     [
-        {x: 60 + 978 + ((imageAssets[props.sprites.backgroundRepeatable].width * spriteScale) * 3), y: props.height - 290},
-        {x: 153 + 978 + ((imageAssets[props.sprites.backgroundRepeatable].width * spriteScale) * 3), y: props.height - 266},
+        {x: 60 + 978 + ((backgroundRepeatableImage.width * spriteScale) * 3), y: props.height - 290},
+        {x: 153 + 978 + ((backgroundRepeatableImage.width * spriteScale) * 3), y: props.height - 266},
     ].forEach(o => { backWinksPositions.push(o) })
     
     const backWinks = backWinksPositions.map(o => createBackWink(o.x, o.y))
@@ -140,8 +151,8 @@ export default async function setup (props, loadScene) {
     const scene = new Scene({
         id: 'game',
         objects: [
-            backgroundStart, ...backgroundRepeatables, backgroundEnd,
-            ...backWinks,
+            ceiling, carpetBrick, ...carpetRepeatables, backgroundStart, ...backgroundRepeatables, backgroundEnd,
+            ...candleImages, ...backWinks,
             ...candles.map(candle => candle.map(poolContainer => poolContainer.pool.objects).flat()).flat(),
             ...men, ...women, player,
             ...bloodBurst.map(blood => blood.pool.objects).flat(),
@@ -282,7 +293,7 @@ export default async function setup (props, loadScene) {
                 if (killerOfPlayer) {
                     bloodBurst.forEach(blood => blood.update())
                 }
-                ;[backgroundStart, ...backgroundRepeatables, backgroundEnd, ...men.map(o => o.children).flat(), ...men, ...women.filter(_woman => _woman !== killerOfPlayer)].forEach(sprite => {
+                scene.objects.filter(o => o !== killerOfPlayer && o !== player).forEach(sprite => {
                     sprite.opacity = lerp(sprite.opacity, 0, 0.05)
                     sprite.children.forEach(c => c.opacity = 0)
                 })
@@ -322,7 +333,7 @@ export default async function setup (props, loadScene) {
                     player.activateAdrenaline()
                 }
                 if (player.x <= 200) {
-                    ;[backgroundStart, ...backgroundRepeatables, backgroundEnd, ...men, ...women].forEach(sprite => {
+                    scene.objects.forEach(sprite => {
                         sprite.opacity = lerp(sprite.opacity, 0, 0.05)
                         sprite.children.forEach(c => c.opacity = 0)
                     })
