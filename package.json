@@ -2,23 +2,22 @@
   "name": "raycating-test",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production",
+    "webpack-build": "webpack --mode production",
     "serve": "webpack serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "css-loader": "^6.8.1",
+    "@web/rollup-plugin-html": "^2.0.1",
     "html-webpack-plugin": "^5.5.3",
+    "kontra": "^9.0.0",
     "style-loader": "^3.3.3",
+    "terser-webpack-plugin": "^5.3.9",
     "webpack": "^5.88.2",
+    "webpack-bundle-analyzer": "^4.9.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
-  },
-  "dependencies": {
-    "kontra": "^9.0.0"
   }
 }

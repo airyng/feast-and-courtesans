@@ -1,4 +1,3 @@
-import './assets/styles/main.css'
 import { init, getContext, load } from 'kontra'
 import sprites from './spritesMap'
 import { setObjectDimensions } from './helpers/graphicsHelper'

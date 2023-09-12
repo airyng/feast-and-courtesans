@@ -4,7 +4,7 @@ import Man from '../classes/Man'
 import Woman from '../classes/Woman'
 import inputHelper from '../helpers/inputHelper'
 import { textObjectGenerator, poolGenerator } from '../helpers/gameObjectGenerator'
-import { createBlinkingStars, drawLine } from '../helpers/graphicsHelper'
+import { createBlinkingStars, drawLine, cropImage } from '../helpers/graphicsHelper'
 
 const keepFollowingPlayerInSec = 4
 const spriteScale = 3
@@ -12,27 +12,32 @@ const spriteScale = 3
 const colorRed = '#b20116'
 
 export default async function setup (props, loadScene) {
-    const   backgroundRepeatableImage = imageAssets[props.sprites.backgroundRepeatable],
-            backgroundStartImage = imageAssets[props.sprites.backgroundStart],
+    const   backgroundRepeatableImage = await cropImage(imageAssets[props.sprites.mainSS], 0, 0, 256, 32),
+            candleImage = await cropImage(imageAssets[props.sprites.mainSS], 256, 0, 29, 36),
+            wallImage = await cropImage(imageAssets[props.sprites.mainSS], 285, 0, 8, 52),
+            carpet2Image = await cropImage(imageAssets[props.sprites.mainSS], 156, 32, 10, 13),
+            carpet1Image = await cropImage(imageAssets[props.sprites.mainSS], 166, 32, 10, 8),
+            roosterImage = await cropImage(imageAssets[props.sprites.mainSS], 190, 32, 40, 19),
+            whitePatternImage = await cropImage(imageAssets[props.sprites.mainSS], 230, 32, 26, 18),
             anchorCenter = {x: 0.5, y: 0.5},
             halfWidth = props.width / 2,
             halfHeight = props.height / 2
-
     let points = 0,
         timerStarted = false
         // gameEndTime = null
-
-    const   candleImages = [116, 460, 814, 1230, 1580, 2000, 2350, 2762, 3120, 3372].map(x => new Sprite({ x, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.candle] })),
-            backgroundStart = new Sprite({ x: 0, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundStartImage }),
-            backgroundRepeatables = new Array(4).fill(null).map((item, index) => new Sprite({ x: (84 * spriteScale) + (index * backgroundRepeatableImage.width * spriteScale), y: 444, scaleX: spriteScale, scaleY: spriteScale, image: backgroundRepeatableImage })),
-            carpetRepeatables = [imageAssets[props.sprites.carpet1], imageAssets[props.sprites.carpet2]].map((image, imageI) => new Array(120).fill(null).map((item, index) => new Sprite({ x: (index * image.width * spriteScale), y: imageI ? 681 : 630, scaleX: spriteScale, scaleY: spriteScale, image }))).flat(),
-            walls = new Array(130).fill(null).map((item, index) => new Sprite({ x: (252 + (index * imageAssets[props.sprites.wall].width * spriteScale)), y: 207, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.wall] })),
-            roosters = new Array(110).fill(null).map((item, index) => new Sprite({ x: (99 + (index * imageAssets[props.sprites.rooster].width * spriteScale)), y: 387, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.rooster] })),
-            ceiling = new Sprite({ x: 252, y: 110, color: '#8d8688', width: 3072, height: 97 }),
-            wallBrick = new Sprite({ x: 252, y: 363, color: colorRed, width: 3500, height: 24 }),
+    const   candleImages = [116, 460, 814, 1230, 1580, 2000, 2350, 2762, 3120, 3372].map(x => new Sprite({ x, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: candleImage })),
+            // backgroundStart = new Sprite({ x: 0, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundStartImage }),
+            backgroundRepeatables = new Array(4).fill(null).map((item, index) => new Sprite({ x: (index * backgroundRepeatableImage.width * spriteScale), y: 480, scaleX: spriteScale, scaleY: spriteScale, image: backgroundRepeatableImage })),
+            carpetRepeatables = [carpet1Image, carpet2Image].map((image, imageI) => new Array(120).fill(null).map((item, index) => new Sprite({ x: (index * image.width * spriteScale), y: imageI ? 682 : 630, scaleX: spriteScale, scaleY: spriteScale, image }))).flat(),
+            walls = new Array(130).fill(null).map((item, index) => new Sprite({ x: index * wallImage.width * spriteScale, y: 207, scaleX: spriteScale, scaleY: spriteScale, image: wallImage })),
+            roosters = new Array(110).fill(null).map((item, index) => new Sprite({ x: ((index * roosterImage.width * spriteScale)), y: 387, scaleX: spriteScale, scaleY: spriteScale, image: roosterImage })),
+            whitePatterns = new Array(110).fill(null).map((item, index) => new Sprite({ x: ((index * whitePatternImage.width * spriteScale)), y: 576, scaleX: spriteScale, scaleY: spriteScale, image: whitePatternImage })),
+            ceiling = new Sprite({ x: 0, y: 110, color: '#8d8688', width: 3072, height: 97 }),
+            wallBrick = new Sprite({ x: 0, y: 363, color: colorRed, width: 3500, height: 24 }),
+            wallBrick2 = new Sprite({ x: 0, y: 443, color: colorRed, width: 3500, height: 40 }),
             carpetBrick = new Sprite({ x: 0, y: 652, color: colorRed, width: 3500, height: 30 }),
-            sceneWidth = (backgroundStartImage.width * spriteScale) + (backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale),
-            player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
+            sceneWidth = backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale,
+            p = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
             men = Array(8).fill(null).map((item, index) => new Man({ x: 390 * (index + 1), y: props.height - 250, animations: props.spriteSheets.men1Spritesheet.animations, scale: spriteScale })),
             women = Array(8).fill(null).map((item, index) => new Woman({ x: (390 * (index + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
             // timerText = textObjectGenerator({x: 50, y: 40}),
@@ -51,8 +56,8 @@ export default async function setup (props, loadScene) {
     const bloodBurst = new Array(50).fill(null).map(i => poolGenerator({
             maxSize: 10,
             get: () => ({
-                x: player.x,
-                y: player.y + 60,
+                x: p.x,
+                y: p.y + 60,
                 dx: (2 - Math.random() * 4) * 2,
                 dy: 1 - (Math.random() * 1.5) + .5,
                 color: 'red',
@@ -66,9 +71,9 @@ export default async function setup (props, loadScene) {
     const scene = new Scene({
         id: 'game',
         objects: [
-            ...walls, ...roosters, wallBrick, ceiling, carpetBrick, ...carpetRepeatables, backgroundStart, ...backgroundRepeatables,
+            ...walls, ...roosters, wallBrick, wallBrick2, ceiling, ...whitePatterns, carpetBrick, ...carpetRepeatables, ...backgroundRepeatables, // backgroundStart, 
             ...candleImages,
-            ...men, ...women, player,
+            ...men, ...women, p,
             ...bloodBurst.map(blood => blood.pool.objects).flat(),
             pointsText // timerText
         ],
@@ -83,9 +88,9 @@ export default async function setup (props, loadScene) {
         // gameEndTime = Date.now() + (playTime * 1000)
         timerStarted = true
         inputHelper.init()
-        inputHelper.on('Space', () => player.setWinking(true))
-        inputHelper.on('ArrowRight', null, () => player.setMoveDirection(0))
-        inputHelper.on('ArrowLeft', null, () => player.setMoveDirection(0))
+        inputHelper.on('Space', () => p.setWinking(true))
+        inputHelper.on('ArrowRight', null, () => p.setMoveDirection(0))
+        inputHelper.on('ArrowLeft', null, () => p.setMoveDirection(0))
     }
 
     preStartText.text = ''
@@ -113,10 +118,10 @@ export default async function setup (props, loadScene) {
         inputHelper.off('Space')
         inputHelper.off('ArrowRight')
         inputHelper.off('ArrowLeft')
-        player.setMoveDirection(0)
+        p.setMoveDirection(0)
         ;[...men, ...women.filter(_woman => _woman !== killerOfPlayer)].forEach(obj => obj.clearCycle())
       
-        killerOfPlayer && player.currentAnimation?.stop?.()
+        killerOfPlayer && p.currentAnimation?.stop?.()
         setTimeout(() => {
             instructions.opacity = 1
             inputHelper.on('Space', () => { 
@@ -129,19 +134,19 @@ export default async function setup (props, loadScene) {
         update () { // update the game state
             const maxPriorityKey = inputHelper.getMaxPriorityPressedButton(['ArrowRight', 'ArrowLeft'])
             if (!checkIsGoalReached() && !killerOfPlayer && maxPriorityKey && timerStarted) { // !timesUp && 
-                player.setMoveDirection(maxPriorityKey === 'ArrowLeft' ? -1 : 1)
+                p.setMoveDirection(maxPriorityKey === 'ArrowLeft' ? -1 : 1)
             }
 
-            if (player.isWinking()) {
+            if (p.isWinking()) {
                 women.forEach(woman => {
-                        if (woman.checkIsPointInView(player.x) && woman.scaleX !== player.scaleX) {
+                        if (woman.checkIsPointInView(p.x) && woman.scaleX !== p.scaleX) {
                             woman.activateAdrenaline(keepFollowingPlayerInSec)
-                            player.activateAdrenaline(keepFollowingPlayerInSec)
+                            p.activateAdrenaline(keepFollowingPlayerInSec)
                         }
                     })
 
                 men.forEach(man => {
-                        if (man.checkIsPointInView(player.x) && man.scaleX !== player.scaleX) {
+                        if (man.checkIsPointInView(p.x) && man.scaleX !== p.scaleX) {
                             const prevLoveLevel = man._loveLevel
                             man.increaseLoveLevel()
                             if (prevLoveLevel < 3 && man._loveLevel === 3) {
@@ -150,14 +155,14 @@ export default async function setup (props, loadScene) {
                             }
                         }
                     })
-                player.setWinking(false)
+                p.setWinking(false)
             }
 
             women
                 .filter(woman => woman.isAdrenalined())
-                .forEach(woman => woman.setTargetX(player.x))
+                .forEach(woman => woman.setTargetX(p.x))
 
-            player?.update(scene)
+            p?.update(scene)
             men.forEach(woman => woman.update())
             women.forEach(woman => woman.update())
 
@@ -181,8 +186,8 @@ export default async function setup (props, loadScene) {
             women.forEach(woman => {
                 if (
                     woman.isAdrenalined() &&
-                    woman.x + woman.width >= player.x - player.width &&
-                    woman.x - woman.width <= player.x + player.width &&
+                    woman.x + woman.width >= p.x - p.width &&
+                    woman.x - woman.width <= p.x + p.width &&
                     !killerOfPlayer
                 ) {
                     killerOfPlayer = woman
@@ -194,11 +199,11 @@ export default async function setup (props, loadScene) {
                 if (killerOfPlayer) {
                     bloodBurst.forEach(blood => blood.update())
                 }
-                scene.objects.filter(o => o !== killerOfPlayer && o !== player).forEach(sprite => {
+                scene.objects.filter(o => o !== killerOfPlayer && o !== p).forEach(sprite => {
                     sprite.opacity = lerp(sprite.opacity, 0, 0.05)
                     sprite.children.forEach(c => c.opacity = 0)
                 })
-                if (backgroundStart.opacity < 0.01) {
+                if (backgroundRepeatables[0].opacity < 0.01) {
                     if (killerOfPlayer) {
                         killedText.opacity = lerp(killedText.opacity, 1, 0.005)
                     } else {
@@ -209,7 +214,7 @@ export default async function setup (props, loadScene) {
             // When player reached the goal
             if (checkIsGoalReached()) {
                 
-                player.setMoveDirection(-1)
+                p.setMoveDirection(-1)
                 
                 const hasUncollectedMen = men.filter(man => man.opacity === 1)?.length > 0
 
@@ -221,19 +226,19 @@ export default async function setup (props, loadScene) {
                             return
                         }
                         man.children.forEach(c => c.opacity = 0)
-                        let lerpSpeed = parseFloat( (1 / Math.abs(Math.abs(man.x) - Math.abs(player.x))) )
+                        let lerpSpeed = parseFloat( (1 / Math.abs(Math.abs(man.x) - Math.abs(p.x))) )
                         if (!lerpSpeed) { lerpSpeed = 0.01}
                         lerpSpeed *= 4
 
-                        man.x = lerp(man.x, player.x, lerpSpeed)
-                        man.y = lerp(man.y, player.y + player.height * 2, lerpSpeed)
+                        man.x = lerp(man.x, p.x, lerpSpeed)
+                        man.y = lerp(man.y, p.y + p.height * 2, lerpSpeed)
                         man.scaleX = lerp(man.scaleX, 0, lerpSpeed / 2)
                         man.scaleY = lerp(man.scaleY, 0, lerpSpeed / 2)
                     })
                 } else {
-                    player.activateAdrenaline()
+                    p.activateAdrenaline()
                 }
-                if (player.x <= 200) {
+                if (p.x <= 200) {
                     scene.objects.forEach(sprite => {
                         sprite.opacity = lerp(sprite.opacity, 0, 0.05)
                         sprite.children.forEach(c => c.opacity = 0)

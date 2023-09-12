@@ -1,7 +1,7 @@
 import { SpriteSheet, imageAssets } from 'kontra'
 import sprites from './spritesMap'
 
-const generateSpriteSheet = (ssName, fw, fh, animations) => new SpriteSheet({
+const genSS = (ssName, fw, fh, animations) => new SpriteSheet({
     image: imageAssets[sprites[ssName]],
     frameWidth: fw,
     frameHeight: fh,
@@ -9,23 +9,9 @@ const generateSpriteSheet = (ssName, fw, fh, animations) => new SpriteSheet({
 })
 
 export default {
-    men1Spritesheet: generateSpriteSheet('menSpritesheet', 20, 40, {
-        idle: { frames: 0 },
-        sip: {
-            frames: [0, 1, 0],
-            frameRate: 1,
-            loop: false
-        }
-    }),
-    men2Spritesheet: generateSpriteSheet('menSpritesheet', 20, 40, {
-        idle: { frames: 2 },
-        sip: {
-            frames: [2, 3, 2],
-            frameRate: 1,
-            loop: false
-        }
-    }),
-    playerSpritesheet: generateSpriteSheet('womenSpritesheet', 30, 38, {
+    men1Spritesheet: genSS('menSpritesheet', 32, 40, { idle: { frames: 0 } }),
+    men2Spritesheet: genSS('menSpritesheet', 20, 40, { idle: { frames: 2 } }),
+    playerSpritesheet: genSS('womenSpritesheet', 30, 38, {
         idle: {
             frames: [0, 1],
             frameRate: 0.5
@@ -39,7 +25,7 @@ export default {
             frameRate: 8
         }
     }),
-    womenSpritesheet: generateSpriteSheet('womenSpritesheet', 30, 38, {
+    womenSpritesheet: genSS('womenSpritesheet', 30, 38, {
         idle: {
             frames: [2, 3],
             frameRate: 0.5
@@ -53,7 +39,7 @@ export default {
             frameRate: 8
         }
     }),
-    winkingSpritesheet: generateSpriteSheet('winkingSpritesheet', 7, 14, {
+    winkingSpritesheet: genSS('winkingSpritesheet', 7, 14, {
         wink: {
             frames: [0, 1],
             frameRate: 10,
