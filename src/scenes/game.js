@@ -1,4 +1,4 @@
-import { Scene, Sprite, randInt, imageAssets, GameLoop, GameObject, lerp } from 'kontra'
+import { Scene, Sprite, randInt, imageAssets, GameLoop, lerp } from 'kontra'
 import Player from '../classes/Player'
 import Man from '../classes/Man'
 import Woman from '../classes/Woman'
@@ -6,84 +6,21 @@ import inputHelper from '../helpers/inputHelper'
 import { textObjectGenerator, poolGenerator } from '../helpers/gameObjectGenerator'
 import { createBlinkingStars, drawLine } from '../helpers/graphicsHelper'
 
-const keepFollowingPlayerInSec = 3
+const keepFollowingPlayerInSec = 4
 const spriteScale = 3
-const playTime = 60 * 3
+// const playTime = 60 * 3
 const colorRed = '#b20116'
-
-const createBackWink = function (x, y, startPlay = true) {
-    const _backWink = new GameObject({ x, y })
-    const eyes = new Array(2).fill(null).map((item, index) => new Sprite({
-        x: 12 * index,
-        y: 0,
-        width: 2,
-        height: 1,
-        scaleX: spriteScale,
-        scaleY: spriteScale,
-        color: '#bca77f',
-        opacity: 0
-    }))
-    _backWink.addChild(eyes)
-
-    function endWink () {
-        setTimeout(() => {
-            if (!_backWink.isAlive()) { return; }
-            _backWink.children.forEach(child => {
-                child.opacity = 0
-            })
-            startWink()
-        }, 150)
-    }
-
-    function startWink () {
-        setTimeout(() => {
-            if (!_backWink.isAlive()) { return; }
-            _backWink.children.forEach(child => {
-                child.opacity = 1
-            })
-            endWink()
-        }, 3000)
-    }
-
-    startPlay && setTimeout(endWink, parseInt(5000 * Math.random()))
-
-    return _backWink
-}
-
-const createCandlesSparks = (x) => {
-    const pools = []
-    for (let index = 0; index < 5; index++) {
-        
-        pools.push(
-            poolGenerator({
-                maxSize: [0, 1, 2][randInt(0, 2)],
-                get: () => ({
-                    x: x + (index * 15),
-                    y: 180,
-                    dx: (-Math.random()*2 + 1) / 10,
-                    dy: -1 / 10,
-                    color: ['#e6e583', '#d3bb06', '#ffffd5'][randInt(0, 2)],
-                    width: spriteScale,
-                    height: spriteScale,
-                    ttl: [100, 140, 180][randInt(0, 2)]
-                })
-            })
-        )
-    }
-    return pools
-}
 
 export default async function setup (props, loadScene) {
     const   backgroundRepeatableImage = imageAssets[props.sprites.backgroundRepeatable],
             backgroundStartImage = imageAssets[props.sprites.backgroundStart],
-            backgroundEndImage = imageAssets[props.sprites.backgroundEnd],
             anchorCenter = {x: 0.5, y: 0.5},
             halfWidth = props.width / 2,
             halfHeight = props.height / 2
 
     let points = 0,
-        timerStarted = false,
-        gameEndTime = null
+        timerStarted = false
+        // gameEndTime = null
 
     const   candleImages = [116, 460, 814, 1230, 1580, 2000, 2350, 2762, 3120, 3372].map(x => new Sprite({ x, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.candle] })),
             backgroundStart = new Sprite({ x: 0, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundStartImage }),
@@ -92,14 +29,13 @@ export default async function setup (props, loadScene) {
             walls = new Array(130).fill(null).map((item, index) => new Sprite({ x: (252 + (index * imageAssets[props.sprites.wall].width * spriteScale)), y: 207, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.wall] })),
             roosters = new Array(110).fill(null).map((item, index) => new Sprite({ x: (99 + (index * imageAssets[props.sprites.rooster].width * spriteScale)), y: 387, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.rooster] })),
             ceiling = new Sprite({ x: 252, y: 110, color: '#8d8688', width: 3072, height: 97 }),
-            wallBrick = new Sprite({ x: 0, y: 363, color: colorRed, width: 3500, height: 30 }),
+            wallBrick = new Sprite({ x: 252, y: 363, color: colorRed, width: 3500, height: 24 }),
             carpetBrick = new Sprite({ x: 0, y: 652, color: colorRed, width: 3500, height: 30 }),
-            sceneWidth = backgroundStartImage.width * spriteScale + (backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale) + backgroundEndImage.width * spriteScale,
-            backgroundEnd = new Sprite({ x: sceneWidth - backgroundEndImage.width * spriteScale, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundEndImage }),
+            sceneWidth = (backgroundStartImage.width * spriteScale) + (backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale),
             player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
-            men = Array(8).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: props.height - 250, animations: props.spriteSheets[`men${randInt(1, 2)}Spritesheet`].animations, scale: spriteScale })),
-            women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
-            timerText = textObjectGenerator({x: 50, y: 40}),
+            men = Array(8).fill(null).map((item, index) => new Man({ x: 390 * (index + 1), y: props.height - 250, animations: props.spriteSheets.men1Spritesheet.animations, scale: spriteScale })),
+            women = Array(8).fill(null).map((item, index) => new Woman({ x: (390 * (index + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
+            // timerText = textObjectGenerator({x: 50, y: 40}),
             pointsText = textObjectGenerator({x: 50, y: 80}),
             preStartText = textObjectGenerator({x: halfWidth, y: 65, fontSize: 80, anchor: anchorCenter}),
             killedText = textObjectGenerator({x: halfWidth, y: halfHeight, fontSize: 80, anchor: anchorCenter, text: 'You\'re dead', opacity: 0}),
@@ -112,30 +48,6 @@ export default async function setup (props, loadScene) {
                 anchor: { x: .5, y: .5 }
             })
     
-    // Set eyes positions
-    const backWinksPositions = [ {x: 210, y: props.height - 284} ]
-    for (let i = 0; i < 4; i++) {
-        [
-            {x: 363, y: 284},
-            {x: 420, y: 293},
-            {x: 534, y: 296},
-            {x: 606, y: 287},
-            {x: 681, y: 296},
-            {x: 798, y: 296},
-            {x: 978, y: 300}
-        ].forEach(o => {
-            backWinksPositions.push({ x: o.x + ((backgroundRepeatableImage.width * spriteScale) * i), y: props.height - o.y })
-        })
-    }
-    [
-        {x: 60 + 978 + ((backgroundRepeatableImage.width * spriteScale) * 3), y: props.height - 290},
-        {x: 153 + 978 + ((backgroundRepeatableImage.width * spriteScale) * 3), y: props.height - 266},
-    ].forEach(o => { backWinksPositions.push(o) })
-    
-    const backWinks = backWinksPositions.map(o => createBackWink(o.x, o.y))
-    
-    const candles = [130, 470, 825, 1240, 1590, 2010, 2360, 2775, 3130, 3385].map(x => createCandlesSparks(x))
-
     const bloodBurst = new Array(50).fill(null).map(i => poolGenerator({
             maxSize: 10,
             get: () => ({
@@ -154,12 +66,11 @@ export default async function setup (props, loadScene) {
     const scene = new Scene({
         id: 'game',
         objects: [
-            ...walls, ...roosters, wallBrick, ceiling, carpetBrick, ...carpetRepeatables, backgroundStart, ...backgroundRepeatables, backgroundEnd,
-            ...candleImages, ...backWinks,
-            ...candles.map(candle => candle.map(poolContainer => poolContainer.pool.objects).flat()).flat(),
+            ...walls, ...roosters, wallBrick, ceiling, carpetBrick, ...carpetRepeatables, backgroundStart, ...backgroundRepeatables,
+            ...candleImages,
             ...men, ...women, player,
             ...bloodBurst.map(blood => blood.pool.objects).flat(),
-            timerText, pointsText
+            pointsText // timerText
         ],
         width: sceneWidth,
         height: props.height
@@ -169,7 +80,7 @@ export default async function setup (props, loadScene) {
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
     const startGameplay = () => {
-        gameEndTime = Date.now() + (playTime * 1000)
+        // gameEndTime = Date.now() + (playTime * 1000)
         timerStarted = true
         inputHelper.init()
         inputHelper.on('Space', () => player.setWinking(true))
@@ -192,7 +103,7 @@ export default async function setup (props, loadScene) {
     }, 500)
 
     let killerOfPlayer = null
-    let timesUp = false
+    // let timesUp = false
 
     function checkIsGoalReached () {
         return points >= men.length
@@ -204,17 +115,8 @@ export default async function setup (props, loadScene) {
         inputHelper.off('ArrowLeft')
         player.setMoveDirection(0)
         ;[...men, ...women.filter(_woman => _woman !== killerOfPlayer)].forEach(obj => obj.clearCycle())
-        candles.forEach(candle => candle.forEach(poolContainer => poolContainer.destroy()))
-        backWinks.forEach(o => {
-            o.ttl = 0
-            o.children.forEach(c => c.opacity = 0)
-        })
-        if (killerOfPlayer) {
-            player.currentAnimation?.stop?.()
-            const playerWink = createBackWink(player.x - 9, player.y + 27, false)
-            playerWink.children.forEach(c => c.opacity = 1)
-            scene.objects.push(playerWink)
-        }
+      
+        killerOfPlayer && player.currentAnimation?.stop?.()
         setTimeout(() => {
             instructions.opacity = 1
             inputHelper.on('Space', () => { 
@@ -226,7 +128,7 @@ export default async function setup (props, loadScene) {
     const loop = new GameLoop({  // create the main game loop
         update () { // update the game state
             const maxPriorityKey = inputHelper.getMaxPriorityPressedButton(['ArrowRight', 'ArrowLeft'])
-            if (!checkIsGoalReached() && !killerOfPlayer && !timesUp && timerStarted && maxPriorityKey) {
+            if (!checkIsGoalReached() && !killerOfPlayer && maxPriorityKey && timerStarted) { // !timesUp && 
                 player.setMoveDirection(maxPriorityKey === 'ArrowLeft' ? -1 : 1)
             }
 
@@ -264,21 +166,17 @@ export default async function setup (props, loadScene) {
             pointsText.x = 50 + scene.camera.x - scene.camera.width/2
 
             // Timer
-            if (timerStarted && gameEndTime) {
-                const timeLeft = Math.floor((gameEndTime - Date.now()) / 1000)
-                timerText.text = `TIME LEFT: ${timeLeft < 0 ? 0 : timeLeft} s`
-                if (timeLeft <= 0 && !killerOfPlayer) {
-                    timesUp = true
-                    stopGameInteractionsScreen()
-                }
-            } else {
-                timerText.text = `TIME LEFT: -`
-            }
-            timerText.x = 50 + scene.camera.x - scene.camera.width/2
-
-            candles.forEach(candle => candle.forEach(poolContainer => {
-                poolContainer.update()
-            }))
+            // if (timerStarted && gameEndTime) {
+            //     const timeLeft = Math.floor((gameEndTime - Date.now()) / 1000)
+            //     timerText.text = `TIME LEFT: ${timeLeft < 0 ? 0 : timeLeft} s`
+            //     if (timeLeft <= 0 && !killerOfPlayer) {
+            //         timesUp = true
+            //         stopGameInteractionsScreen()
+            //     }
+            // } else {
+            //     timerText.text = `TIME LEFT: -`
+            // }
+            // timerText.x = 50 + scene.camera.x - scene.camera.width/2
 
             women.forEach(woman => {
                 if (
@@ -292,7 +190,7 @@ export default async function setup (props, loadScene) {
                 }
             })
             // When player failed -> run end screen
-            if (!checkIsGoalReached() && (killerOfPlayer || timesUp)) {
+            if (!checkIsGoalReached() && killerOfPlayer) { //  || timesUp
                 if (killerOfPlayer) {
                     bloodBurst.forEach(blood => blood.update())
                 }
@@ -358,7 +256,6 @@ export default async function setup (props, loadScene) {
         loop.stop()
         blinkingStars.destroy()
         bloodBurst.forEach(bloodContainer => bloodContainer.destroy())
-        candles.forEach(candle => candle.forEach(poolContainer => poolContainer.destroy()))
         inputHelper.off('Space')
         inputHelper.off('ArrowRight')
         inputHelper.off('ArrowLeft')

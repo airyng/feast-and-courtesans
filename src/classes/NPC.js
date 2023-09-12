@@ -35,7 +35,7 @@ export default class NPC extends SpriteClass {
         this._flipInterval = setInterval(() => {
             if (this.targetX) { return }
             this.scaleX *= -1
-            this.animations?.sip && this.playAnimation('sip')
+            // this.animations?.sip && this.playAnimation('sip')
             this.onFlipped?.()
         }, randInt(5, 10) * 1000)
     }

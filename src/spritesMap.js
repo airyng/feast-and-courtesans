@@ -1,7 +1,6 @@
 export default {
     backgroundStart: require('./assets/images/back1.png'),
     backgroundRepeatable: require('./assets/images/back2.png'),
-    backgroundEnd: require('./assets/images/back3.png'),
     heart: require('./assets/images/heart.png'),
     rage: require('./assets/images/rage.png'),
     candle: require('./assets/images/candle.png'),
