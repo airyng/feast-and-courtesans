@@ -1,6 +1,6 @@
 import { randInt } from 'kontra'
 
-export const drawLine = (scene, from = {x: 0, y: 0}, to = {x: 0, y: 0}, color = 'grey', lineWidth = 1) => {
+export const drawLine = (scene, from = {x: 0, y: 0}, to = {x: 0, y: 0}, lineWidth = 1, color = 'grey') => {
     const ctx = scene.context
     ctx.beginPath() // Start a new path
     ctx.strokeStyle = color
@@ -42,7 +42,7 @@ export const createBlinkingStars = (starsNumber, scene, from = { x: 0, y: 0 }, t
         render () {
             stars.forEach((star) => {
                 if (!star.visible) { return }
-                drawLine(scene, {x: star.x, y: star.y}, {x: star.x + 1, y: star.y + 1}, 'grey')
+                drawLine(scene, {x: star.x, y: star.y}, {x: star.x + 1, y: star.y + 1})
             })
         },
         destroy () {

@@ -98,7 +98,6 @@ export default class NPC extends SpriteClass {
         }
         // Move to target if exists
         this._targetX !== null && this.moveTo(this._targetX)
-        
 
         super.update()
     }

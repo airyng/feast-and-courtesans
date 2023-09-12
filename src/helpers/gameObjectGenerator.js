@@ -2,7 +2,7 @@ import { Text, Sprite, Pool } from 'kontra'
 
 export const textObjectGenerator = (props = {}) => new Text({
     text: '-',
-    font: '24px cursive, Arial',
+    font: `${props.fontSize || 24}px cursive, Arial`,
     color: 'white',
     x: 50, y: 50,
     anchor: {x: 0, y: 0.5},

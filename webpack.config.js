@@ -7,8 +7,13 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.[contenthash].js',
-    clean: true
-  }, 
+    clean: true,
+    asyncChunks: false
+  },
+  optimization: {
+    mergeDuplicateChunks: true,
+    minimize: true
+  },
   devServer: {
     static: {
         directory: path.resolve(__dirname, 'dist'),
@@ -18,7 +23,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-        title: 'Medieval Courtesan',
+        title: 'Feast and courtesans',
         template: 'index.html',
         filename: 'index.html'
     })

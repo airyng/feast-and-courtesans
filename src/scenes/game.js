@@ -6,10 +6,9 @@ import inputHelper from '../helpers/inputHelper'
 import { textObjectGenerator, poolGenerator } from '../helpers/gameObjectGenerator'
 import { createBlinkingStars, drawLine } from '../helpers/graphicsHelper'
 
-
-const keepFollowingPlayerInSec = 5
+const keepFollowingPlayerInSec = 3
 const spriteScale = 3
-const playTime = 60 * 2
+const playTime = 60 * 3
 
 const createBackWink = function (x, y, startPlay = true) {
     const _backWink = new GameObject({ x, y })
@@ -88,13 +87,13 @@ export default async function setup (props, loadScene) {
 
     const timerText = textObjectGenerator({x: 50, y: 40})
     const pointsText = textObjectGenerator({x: 50, y: 80})
-    const preStartText = textObjectGenerator({x: props.width / 2, y: 65, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}})
-    const killedText = textObjectGenerator({x: props.width / 2, y: props.height / 2, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}, text: 'You\'re dead', opacity: 0})
-    const winText = textObjectGenerator({x: props.width / 2, y: props.height / 2, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}, text: 'All the boyars are seduced 😜', opacity: 0})
-    const timeOverText = textObjectGenerator({x: props.width / 2, y: props.height / 2, font: '80px cursive, Arial', anchor: {x: 0.5, y: 0.5}, text: 'Time\'s up', opacity: 0})
+    const preStartText = textObjectGenerator({x: props.width / 2, y: 65, fontSize: 80, anchor: {x: 0.5, y: 0.5}})
+    const killedText = textObjectGenerator({x: props.width / 2, y: props.height / 2, fontSize: 80, anchor: {x: 0.5, y: 0.5}, text: 'You\'re dead', opacity: 0})
+    const winText = textObjectGenerator({x: props.width / 2, y: props.height / 2, fontSize: 80, anchor: {x: 0.5, y: 0.5}, text: 'All the boyars are seduced 😜', opacity: 0})
+    const timeOverText = textObjectGenerator({x: props.width / 2, y: props.height / 2, fontSize: 80, anchor: {x: 0.5, y: 0.5}, text: 'Time\'s up', opacity: 0})
     const instructions = textObjectGenerator({
         text: 'Press \'space\' to restart',
-        x: props.width / 2, y: props.height - 100, color: 'grey', font: '16px cursive, Arial',
+        x: props.width / 2, y: props.height - 100, color: 'grey', fontSize: 16,
         opacity: 0,
         anchor: { x: .5, y: .5 }
     })
@@ -336,7 +335,7 @@ export default async function setup (props, loadScene) {
         },
         render () { // render the game state
             scene.render()
-            drawLine(scene, {x: 0, y: 115}, {x: props.width, y: 115}, 'grey', 10)
+            drawLine(scene, {x: 0, y: 115}, {x: props.width, y: 115}, 10)
             ;[blinkingStars, preStartText, preStartText, winText, killedText, timeOverText, instructions].forEach(o => o?.render())
         }
     })
