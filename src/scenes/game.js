@@ -9,6 +9,7 @@ import { createBlinkingStars, drawLine } from '../helpers/graphicsHelper'
 const keepFollowingPlayerInSec = 3
 const spriteScale = 3
 const playTime = 60 * 3
+const colorRed = '#b20116'
 
 const createBackWink = function (x, y, startPlay = true) {
     const _backWink = new GameObject({ x, y })
@@ -72,7 +73,6 @@ const createCandlesSparks = (x) => {
     return pools
 }
 
-
 export default async function setup (props, loadScene) {
     const   backgroundRepeatableImage = imageAssets[props.sprites.backgroundRepeatable],
             backgroundStartImage = imageAssets[props.sprites.backgroundStart],
@@ -87,14 +87,17 @@ export default async function setup (props, loadScene) {
 
     const   candleImages = [116, 460, 814, 1230, 1580, 2000, 2350, 2762, 3120, 3372].map(x => new Sprite({ x, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.candle] })),
             backgroundStart = new Sprite({ x: 0, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundStartImage }),
-            backgroundRepeatables = new Array(4).fill(null).map((item, index) => new Sprite({ x: (84 * spriteScale) + (index * backgroundRepeatableImage.width * spriteScale), y: 207, scaleX: spriteScale, scaleY: spriteScale, image: backgroundRepeatableImage })),
+            backgroundRepeatables = new Array(4).fill(null).map((item, index) => new Sprite({ x: (84 * spriteScale) + (index * backgroundRepeatableImage.width * spriteScale), y: 444, scaleX: spriteScale, scaleY: spriteScale, image: backgroundRepeatableImage })),
             carpetRepeatables = [imageAssets[props.sprites.carpet1], imageAssets[props.sprites.carpet2]].map((image, imageI) => new Array(120).fill(null).map((item, index) => new Sprite({ x: (index * image.width * spriteScale), y: imageI ? 681 : 630, scaleX: spriteScale, scaleY: spriteScale, image }))).flat(),
-            ceiling = new Sprite({ x: 252, y: 110, color: '#8d8688', width: 3072, height: 98 }),
-            carpetBrick = new Sprite({ x: 0, y: 652, color: '#b20116', width: 3500, height: 30 }),
+            walls = new Array(130).fill(null).map((item, index) => new Sprite({ x: (252 + (index * imageAssets[props.sprites.wall].width * spriteScale)), y: 207, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.wall] })),
+            roosters = new Array(110).fill(null).map((item, index) => new Sprite({ x: (99 + (index * imageAssets[props.sprites.rooster].width * spriteScale)), y: 387, scaleX: spriteScale, scaleY: spriteScale, image: imageAssets[props.sprites.rooster] })),
+            ceiling = new Sprite({ x: 252, y: 110, color: '#8d8688', width: 3072, height: 97 }),
+            wallBrick = new Sprite({ x: 0, y: 363, color: colorRed, width: 3500, height: 30 }),
+            carpetBrick = new Sprite({ x: 0, y: 652, color: colorRed, width: 3500, height: 30 }),
             sceneWidth = backgroundStartImage.width * spriteScale + (backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale) + backgroundEndImage.width * spriteScale,
             backgroundEnd = new Sprite({ x: sceneWidth - backgroundEndImage.width * spriteScale, y: 120, scaleX: spriteScale, scaleY: spriteScale, image: backgroundEndImage }),
             player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
-            men = Array(1).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: props.height - 250, animations: props.spriteSheets[`men${randInt(1, 2)}Spritesheet`].animations, scale: spriteScale })),
+            men = Array(8).fill(null).map((item, index) => new Man({ x: 400 * (index + 1), y: props.height - 250, animations: props.spriteSheets[`men${randInt(1, 2)}Spritesheet`].animations, scale: spriteScale })),
             women = Array(8).fill(null).map((item, index) => new Woman({ x: (400 * (index + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
             timerText = textObjectGenerator({x: 50, y: 40}),
             pointsText = textObjectGenerator({x: 50, y: 80}),
@@ -151,7 +154,7 @@ export default async function setup (props, loadScene) {
     const scene = new Scene({
         id: 'game',
         objects: [
-            ceiling, carpetBrick, ...carpetRepeatables, backgroundStart, ...backgroundRepeatables, backgroundEnd,
+            ...walls, ...roosters, wallBrick, ceiling, carpetBrick, ...carpetRepeatables, backgroundStart, ...backgroundRepeatables, backgroundEnd,
             ...candleImages, ...backWinks,
             ...candles.map(candle => candle.map(poolContainer => poolContainer.pool.objects).flat()).flat(),
             ...men, ...women, player,

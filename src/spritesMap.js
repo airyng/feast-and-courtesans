@@ -7,6 +7,8 @@ export default {
     candle: require('./assets/images/candle.png'),
     carpet1: require('./assets/images/carpet1.png'),
     carpet2: require('./assets/images/carpet2.png'),
+    rooster: require('./assets/images/rooster.png'),
+    wall: require('./assets/images/wall.png'),
     winkingSpritesheet: require('./assets/images/spritesheets/winking-spritesheet.png'),
     menSpritesheet: require('./assets/images/spritesheets/men-spritesheet.png'),
     womenSpritesheet: require('./assets/images/spritesheets/women-spritesheet.png')

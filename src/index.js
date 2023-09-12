@@ -35,5 +35,5 @@ const loadScene = async (currentScene, nextSceneSetup) => {
     loop.start()
 }
 
-loadScene(null, gameProps.sceneSetupsList.game)
-// loadScene(null, gameProps.sceneSetupsList.start)
+// loadScene(null, gameProps.sceneSetupsList.game)
+loadScene(null, gameProps.sceneSetupsList.start)
