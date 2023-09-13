@@ -1,5 +1,5 @@
 import { Scene, GameLoop } from 'kontra'
-import inputHelper from '../helpers/inputHelper'
+import input from '../helpers/inputHelper'
 import { renderText } from '../helpers/gameObjectGenerator'
 import Player from '../classes/Player'
 import { drawLine, createBlinkingStars } from '../helpers/graphicsHelper'
@@ -8,15 +8,11 @@ export default async function setup (props, loadScene) {
 
     const   h1Renderer = () => renderText({ text: 'Feast and courtesans', x: props.width / 2, y: 150, color: 'white', fontSize: 48 }),
             descriptionRenderer = () => {
-                renderText({    text: 'Well... Today I need to seduce as many boyars as possible',
-                                x: 400, y: props.height - 300, color: 'white', fontSize: 18
-                        })
-                renderText({    text: 'in order to extract gold from these moneybags.',
-                        x: 360, y: props.height - 280, color: 'white', fontSize: 18
-                })
-                renderText({    text: 'I hope there will be no competitors at the feast...',
-                        x: 370, y: props.height - 260, color: 'white', fontSize: 18
-                })
+                ;[
+                    { text: 'Well... Today I need to seduce as many boyars as possible', x: 400 },
+                    { text: 'in order to extract gold from these moneybags.', x: 360 },
+                    { text: 'I hope there will be no competitors at the feast...', x: 370 },
+                ].forEach((_props, i) => renderText({text: _props.text, x: _props.x, y: props.height - 300 - (i * 20), color: 'white', fontSize: 18 }))
             },
             instructionsRenderer = () => renderText({
                                                 text: 'Press \'arrows\' to move left and right. Press \'space\' to make an seductive wink',
@@ -25,25 +21,19 @@ export default async function setup (props, loadScene) {
             player = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: 3, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } })
             
     const scene = new Scene({
-        id: 'startScreen',
         width: props.width,
         height: props.height
     });
     const   blinkingStars = createBlinkingStars(100, scene, { x: 5, y: 5 }, { x: props.width - 5, y: props.height - 400 })
-            
-    // Align to center
-    // ;[h1, instructions].forEach(obj => {
-    //     obj.x -= obj.width / 2 
-    // })
 
-    inputHelper.init()
-    inputHelper.on('Space', () => player.setWinking(true))
-    inputHelper.on('ArrowRight', null, () => player.setMoveDirection(0))
-    inputHelper.on('ArrowLeft', null, () => player.setMoveDirection(0))
+    input.init()
+    input.on('Space', () => player.setWinking(true))
+    input.on('ArrowRight', null, () => player.setMoveDirection(0))
+    input.on('ArrowLeft', null, () => player.setMoveDirection(0))
 
     const loop = new GameLoop({  // create the main game loop
         update () { // update the game state
-            const maxPriorityKey = inputHelper.getMaxPriorityPressedButton(['ArrowRight', 'ArrowLeft'])
+            const maxPriorityKey = input.getMaxPriorityPressedButton(['ArrowRight', 'ArrowLeft'])
             if (maxPriorityKey) {
                 player.setMoveDirection(maxPriorityKey === 'ArrowLeft' ? -1 : 1)
             }
@@ -71,9 +61,9 @@ export default async function setup (props, loadScene) {
 
     scene.beforeDestroy = () => {
         loop.stop()
-        inputHelper.off('Space')
-        inputHelper.off('ArrowRight')
-        inputHelper.off('ArrowLeft')
+        input.off('Space')
+        input.off('ArrowRight')
+        input.off('ArrowLeft')
         blinkingStars.destroy()
         scene.remove([player])
     }

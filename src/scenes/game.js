@@ -67,7 +67,6 @@ export default async function setup (props, loadScene) {
     )
 
     const scene = new Scene({
-        id: 'game',
         objects: [
             wallBrick, ...walls, ...roosters, ceiling, ...whitePatterns, carpetBrick, ...carpetRepeatables, ...backgroundRepeatables, // backgroundStart, 
             ...candleImages,
@@ -92,16 +91,15 @@ export default async function setup (props, loadScene) {
     }
 
     setTimeout(async () => {
-        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: '1'})
-        await sleep(1000)
-        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: '2'})
-        await sleep(1000)
-        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: '3'})
-        await sleep(1000)
-        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: 'SEDUCE!'})
-        startGameplay()
-        await sleep(1000)
-        preStartTextRenderer = () => {}
+        const updatePreStartTextRenderer = (text) => {
+                preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text})
+            },
+            texts = ['1', '2', '3', 'SEDUCE!', ' ']
+        for (let index = 0; index < texts.length; index++) {
+            updatePreStartTextRenderer(texts[index])
+            if (texts[index] === 'SEDUCE!') { startGameplay() }
+            await sleep(1000)
+        }
     }, 500)
 
     let killerOfPlayer = null
