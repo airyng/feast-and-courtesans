@@ -3,7 +3,7 @@ import Player from '../classes/Player'
 import Man from '../classes/Man'
 import Woman from '../classes/Woman'
 import input from '../helpers/inputHelper'
-import { textObjectGenerator as txtGen, poolGenerator } from '../helpers/gameObjectGenerator'
+import { renderText, poolGenerator } from '../helpers/gameObjectGenerator'
 import { createBlinkingStars, drawLine, cropImage } from '../helpers/graphicsHelper'
 
 const keepFollowingPlayerInSec = 4
@@ -20,7 +20,6 @@ export default async function setup (props, loadScene) {
             carpet1Image = await cropImage(mainSS, 166, 32, 10, 8),
             roosterImage = await cropImage(mainSS, 190, 32, 40, 19),
             whitePatternImage = await cropImage(mainSS, 230, 32, 26, 18),
-            anchorCenter = {x: 0.5, y: 0.5},
             hw = props.width / 2,
             hh = props.height / 2
     let points = 0,
@@ -39,20 +38,18 @@ export default async function setup (props, loadScene) {
             carpetBrick = new Sprite({ x: 0, y: 652, color: colorRed, width: 3500, height: 30 }),
             sceneWidth = backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale,
             p = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
-            men = Array(8).fill(null).map((item, i) => new Man({ x: 390 * (i + 1), y: props.height - 250, animations: props.spriteSheets.men1Spritesheet.animations, scale: spriteScale })),
+            men = Array(1).fill(null).map((item, i) => new Man({ x: 390 * (i + 1), y: props.height - 250, animations: props.spriteSheets.men1Spritesheet.animations, scale: spriteScale })),
             women = Array(8).fill(null).map((item, i) => new Woman({ x: (390 * (i + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
-            // timerText = txtGen({x: 50, y: 40}),
-            pointsText = txtGen({x: 50, y: 80}),
-            preStartText = txtGen({x: hw, y: 65, fontSize: 80, anchor: anchorCenter}),
-            killedText = txtGen({x: hw, y: hh, fontSize: 80, anchor: anchorCenter, text: 'You\'re dead', opacity: 0}),
-            winText = txtGen({x: hw, y: hh, fontSize: 80, anchor: anchorCenter, text: 'All the boyars are seduced 😜', opacity: 0}),
-            timeOverText = txtGen({x: hw, y: hh, fontSize: 80, anchor: anchorCenter, text: 'Time\'s up', opacity: 0}),
-            instructions = txtGen({
-                text: 'Press \'space\' to restart',
-                x: hw, y: props.height - 100, color: 'grey', fontSize: 16,
-                opacity: 0,
-                anchor: { x: .5, y: .5 }
-            })
+            pointsTextRenderer = () => {
+                renderText({x: 180, y: 80, text: `BOYARS ATTRACTED: ${points}/${men.length}`})
+            }
+
+    let preStartTextRenderer = () => {},
+        killedTextRenderer = () => {},
+        winTextRenderer = () => {},
+        instructionsRenderer = () => {},
+        killedTextOpacity = 0,
+        winTextOpacity = 0
     
     const bloodBurst = new Array(50).fill(null).map(i => poolGenerator({
             maxSize: 10,
@@ -76,7 +73,7 @@ export default async function setup (props, loadScene) {
             ...candleImages,
             ...men, ...women, p,
             ...bloodBurst.map(blood => blood.pool.objects).flat(),
-            pointsText // timerText
+            // pointsText // timerText
         ],
         width: sceneWidth,
         height: props.height
@@ -94,18 +91,17 @@ export default async function setup (props, loadScene) {
         input.on('ArrowLeft', null, () => p.setMoveDirection(0))
     }
 
-    preStartText.text = ''
     setTimeout(async () => {
-        preStartText.text = '1'
+        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: '1'})
         await sleep(1000)
-        preStartText.text = '2'
+        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: '2'})
         await sleep(1000)
-        preStartText.text = '3'
+        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: '3'})
         await sleep(1000)
-        preStartText.text = 'SEDUCE!'
+        preStartTextRenderer = () => renderText({x: hw, y: 80, fontSize: 80, text: 'SEDUCE!'})
         startGameplay()
         await sleep(1000)
-        preStartText.text = ''
+        preStartTextRenderer = () => {}
     }, 500)
 
     let killerOfPlayer = null
@@ -124,7 +120,10 @@ export default async function setup (props, loadScene) {
       
         killerOfPlayer && p.currentAnimation?.stop?.()
         setTimeout(() => {
-            instructions.opacity = 1
+            instructionsRenderer = () => renderText({
+                text: 'Press \'space\' to restart',
+                x: hw, y: props.height - 100, color: 'grey', fontSize: 16
+            })
             input.on('Space', () => { 
                 loadScene(scene, props.sceneSetupsList.game)
             })
@@ -168,8 +167,8 @@ export default async function setup (props, loadScene) {
             women.forEach(w => w.update())
 
             // Points
-            pointsText.text = `BOYARS ATTRACTED: ${points}/${men.length}`
-            pointsText.x = 50 + scene.camera.x - scene.camera.width/2
+            // pointsText.text = `BOYARS ATTRACTED: ${points}/${men.length}`
+            // pointsText.x = 50 + scene.camera.x - scene.camera.width/2
 
             // Timer
             // if (timerStarted && gameEndTime) {
@@ -206,10 +205,12 @@ export default async function setup (props, loadScene) {
                 })
                 if (backgroundRepeatables[0].opacity < 0.01) {
                     if (killerOfPlayer) {
-                        killedText.opacity = lerp(killedText.opacity, 1, 0.005)
-                    } else {
-                        timeOverText.opacity = lerp(timeOverText.opacity, 1, 0.005)
+                        killedTextOpacity = lerp(killedTextOpacity, 1, 0.005)
+                        killedTextRenderer = () => renderText({x: hw, y: hh, fontSize: 80, text: 'You\'re dead', color: `rgba(255,255,255,${killedTextOpacity})`})
                     }
+                    // else {
+                    //     timeOverText.opacity = lerp(timeOverText.opacity, 1, 0.005)
+                    // }
                 }
             }
             // When player reached the goal
@@ -244,8 +245,9 @@ export default async function setup (props, loadScene) {
                         sprite.opacity = lerp(sprite.opacity, 0, 0.05)
                         sprite.children.forEach(c => c.opacity = 0)
                     })
-                    if (backgroundStart.opacity < 0.01) {
-                        winText.opacity = lerp(winText.opacity, 1, 0.005)
+                    if (backgroundRepeatables[0].opacity < 0.01) {
+                        winTextOpacity = lerp(winTextOpacity, 1, 0.005)
+                        winTextRenderer = () => renderText({x: hw, y: hh, fontSize: 80, text: 'All the boyars are seduced 😜', color: `rgba(255,255,255,${winTextOpacity})`})
                     }
                 }
                 
@@ -254,7 +256,12 @@ export default async function setup (props, loadScene) {
         render () { // render the game state
             scene.render()
             drawLine(scene, {x: 0, y: 115}, {x: props.width, y: 115}, 10)
-            ;[blinkingStars, preStartText, preStartText, winText, killedText, timeOverText, instructions].forEach(o => o?.render())
+            ;[blinkingStars].forEach(o => o?.render())
+            instructionsRenderer()
+            winTextRenderer()
+            killedTextRenderer()
+            pointsTextRenderer()
+            preStartTextRenderer()
         }
     })
 
@@ -266,7 +273,7 @@ export default async function setup (props, loadScene) {
         input.off('ArrowRight')
         input.off('ArrowLeft')
         ;[...men, ...women].forEach(obj => obj.clearCycle())
-        scene.remove([...scene.objects, preStartText])
+        scene.remove([...scene.objects])
     }
 
     return {loop, scene}
