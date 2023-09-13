@@ -38,8 +38,8 @@ export default async function setup (props, loadScene) {
             carpetBrick = new Sprite({ x: 0, y: 652, color: colorRed, width: 3500, height: 30 }),
             sceneWidth = backgroundRepeatableImage.width * backgroundRepeatables.length * spriteScale,
             p = new Player({ x: 300, y: props.height - 250 + 6, animations: props.spriteSheets.playerSpritesheet.animations, scale: spriteScale, extraAnimations: { winking: props.spriteSheets.winkingSpritesheet.animations } }),
-            men = Array(1).fill(null).map((item, i) => new Man({ x: 390 * (i + 1), y: props.height - 250, animations: props.spriteSheets.men1Spritesheet.animations, scale: spriteScale })),
-            women = Array(8).fill(null).map((item, i) => new Woman({ x: (390 * (i + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
+            men = Array(7).fill(null).map((item, i) => new Man({ x: 390 * (i + 1), y: props.height - 250, animations: props.spriteSheets.men1Spritesheet.animations, scale: spriteScale })),
+            women = Array(7).fill(null).map((item, i) => new Woman({ x: (390 * (i + 1)) + 100, y: props.height - 250 + 6, animations: props.spriteSheets.womenSpritesheet.animations, scale: spriteScale, viewLength: 500 })),
             pointsTextRenderer = () => {
                 renderText({x: 180, y: 80, text: `BOYARS ATTRACTED: ${points}/${men.length}`})
             }
