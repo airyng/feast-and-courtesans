@@ -3,8 +3,8 @@ import { randInt } from 'kontra'
 export const cropImage = (sourceImage, x, y, w, h) => {
     return new Promise(resolve => {
         const   canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d'),
-            newImage = document.createElement('img')
+                ctx = canvas.getContext('2d'),
+                newImage = document.createElement('img')
         canvas.width = w
         canvas.height = h
         ctx.drawImage(sourceImage,

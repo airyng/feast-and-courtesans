@@ -1,5 +1,6 @@
-import { init, getContext, load } from 'kontra'
-import sprites from './spritesMap'
+import { init, getContext } from 'kontra'
+import { mainSS } from './spriteSheetsMap'
+import spriteSheets from './spriteSheetsMap'
 import { setObjectDimensions } from './helpers/graphicsHelper'
 
 const   width = 1200,
@@ -13,13 +14,13 @@ getContext().imageSmoothingEnabled = false
 ;['load', 'resize'].forEach(type => window.addEventListener(type, () => setObjectDimensions(canvas, document.querySelector('body'))))
 
 // Load all the sprites and spritesheets
-await load(...Object.keys(sprites).map((key) => sprites[key]))
-const spriteSheets = (await import ('./spriteSheetsMap')).default
+// await load(...Object.keys(sprites).map((key) => sprites[key]))
+// const spriteSheets = (await import ('./spriteSheetsMap')).default
 
 const gameProps = {
     width,
     height,
-    sprites,
+    mainSS,
     spriteSheets,
     sceneSetupsList: {
         start: (await import ('./scenes/start')).default,
@@ -34,5 +35,5 @@ const loadScene = async (currentScene, nextSceneSetup) => {
     loop.start()
 }
 
-// loadScene(null, gameProps.sceneSetupsList.game)
-loadScene(null, gameProps.sceneSetupsList.start)
+loadScene(null, gameProps.sceneSetupsList.game)
+// loadScene(null, gameProps.sceneSetupsList.start)

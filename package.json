@@ -5,12 +5,14 @@
   "scripts": {
     "webpack-build": "webpack --mode production",
     "serve": "webpack serve",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "advzip": "node advzip.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@web/rollup-plugin-html": "^2.0.1",
+    "advzip-bin": "^2.0.0",
     "html-webpack-plugin": "^5.5.3",
     "kontra": "^9.0.0",
     "style-loader": "^3.3.3",

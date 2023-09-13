@@ -1,5 +1,5 @@
 export default {
-    mainSS: require('./assets/images/spritesheets/main.png'),
+    // mainSS: require('./assets/images/spritesheets/main.png'),
     // whitePattern: require('./assets/images/white_pattern.png'),
     // backgroundRepeatable: require('./assets/images/back2.png'),
     // heart: require('./assets/images/heart.png'),
@@ -9,7 +9,7 @@ export default {
     // carpet2: require('./assets/images/carpet2.png'),
     // rooster: require('./assets/images/rooster.png'),
     // wall: require('./assets/images/wall.png'),
-    winkingSpritesheet: require('./assets/images/spritesheets/winking-spritesheet.png'),
-    menSpritesheet: require('./assets/images/spritesheets/men-spritesheet.png'),
-    womenSpritesheet: require('./assets/images/spritesheets/women-spritesheet.png')
+    // winkingSpritesheet: require('./assets/images/spritesheets/winking-spritesheet.png'),
+    // menSpritesheet: require('./assets/images/spritesheets/men-spritesheet.png'),
+    // womenSpritesheet: require('./assets/images/spritesheets/women-spritesheet.png')
 }

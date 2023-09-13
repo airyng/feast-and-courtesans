@@ -1,6 +1,6 @@
 import NPC from './NPC'
-import sprites from '../spritesMap'
-import { imageAssets, Sprite } from 'kontra'
+import { mainSS } from '../spriteSheetsMap'
+import { Sprite } from 'kontra'
 import { cropImage } from '../helpers/graphicsHelper'
 
 const maxLoveLevel = 3
@@ -13,8 +13,7 @@ export default class Man extends NPC {
         super(properties)
         const that = this
         ;(async function () {
-            
-            const heartImage = await cropImage(imageAssets[sprites.mainSS], 176, 32, 7, 6)
+            const heartImage = await cropImage(mainSS, 176, 32, 7, 6)
             const createHeart = (x = 0, y = -10) => new Sprite({ image: heartImage, x, y, opacity: 0, anchor: { x: 0.5, y: 0 } })
 
             that.addChild(
